@@ -1,14 +1,15 @@
 import win.ui
 /*DSG{{*/
-mainForm = win.form(text="name_exchanger";right=372;bottom=249;acceptfiles=1)
+mainForm = win.form(text="name_exchanger";right=372;bottom=249;acceptfiles=1;topmost=1)
 mainForm.add(
 button={cls="button";text="Start";left=212;top=192;right=355;bottom=240;font=LOGFONT(h=-16);z=3};
 edit={cls="edit";left=14;top=33;right=355;bottom=85;edge=1;multiline=1;z=1};
-edit2={cls="edit";left=14;top=122;right=355;bottom=180;edge=1;multiline=1;z=2};
+edit2={cls="edit";left=12;top=111;right=353;bottom=169;edge=1;multiline=1;z=2};
 static={cls="static";text="File1";left=18;top=12;right=245;bottom=29;transparent=1;z=4};
-static2={cls="static";text="File2";left=19;top=99;right=265;bottom=116;transparent=1;z=5};
+static2={cls="static";text="File2";left=17;top=88;right=263;bottom=105;transparent=1;z=5};
 static3={cls="static";text="Drag the file
-to this Window";left=10;top=200;right=167;bottom=241;align="center";font=LOGFONT(h=-16;name='微软雅黑');transparent=1;z=6}
+to this Window
+Click to top or untop it";left=12;top=179;right=189;bottom=241;align="center";font=LOGFONT(h=-16;name='微软雅黑');notify=1;transparent=1;z=6}
 )
 /*}}*/
 
@@ -41,13 +42,24 @@ mainForm.button.oncommand = function(id,event){
 		var temp1 = io.splitpath(mainForm.edit.text)
 		var temp2 = io.splitpath(mainForm.edit2.text) 
 		io.rename(mainForm.edit.text,temp1.dir + "4E12BB82E9754E38FA8F")
-		io.rename(mainForm.edit2.text,temp2.dir + temp1.file) 
-		io.rename(temp1.dir + "4E12BB82E9754E38FA8F",temp1.dir + temp2.file)
+		io.rename(mainForm.edit2.text,temp2.dir + temp1.name + temp2.ext) 
+		io.rename(temp1.dir + "4E12BB82E9754E38FA8F",temp1.dir + temp2.name + temp1.ext)
 		mainForm.edit.text = ""
 		mainForm.edit2.text = ""
 	}else {
 		mainForm.edit2.text = ""
 		win.msgbox("Error for same file","error",,mainForm.hwnd,,500)
+	}
+	
+}
+var ontop = true
+mainForm.static3.oncommand = function(id,event){
+	if(ontop){
+		win.setTopmost(mainForm.hwnd,false)
+		ontop = false
+	}else{
+		win.setTopmost(mainForm.hwnd)
+		ontop = true
 	}
 	
 }
