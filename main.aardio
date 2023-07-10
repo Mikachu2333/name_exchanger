@@ -1,0 +1,48 @@
+import win.ui
+/*DSG{{*/
+mainForm = win.form(text="name_exchanger";right=372;bottom=249;acceptfiles=1)
+mainForm.add(
+button={cls="button";text="Button";left=212;top=192;right=355;bottom=240;z=3};
+edit={cls="edit";left=14;top=33;right=355;bottom=85;edge=1;multiline=1;z=1};
+edit2={cls="edit";left=14;top=122;right=355;bottom=180;edge=1;multiline=1;z=2};
+static={cls="static";text="File1  Double Click RButton to select file";left=18;top=12;right=245;bottom=29;transparent=1;z=4};
+static2={cls="static";text="File2  Double Click RButton to select file";left=19;top=99;right=265;bottom=116;transparent=1;z=5};
+static3={cls="static";text="Drag the file
+to this Window";left=10;top=200;right=167;bottom=241;align="center";font=LOGFONT(h=-16;name='微软雅黑');transparent=1;z=6}
+)
+/*}}*/
+
+mainForm.onDropFiles = function(files){
+	select(tonumber(table.len(files))) {
+		case 1 {
+			if(mainForm.edit.text == ""){
+				mainForm.edit.text = files[1]
+			}elseif(mainForm.edit2.text == ""){
+				mainForm.edit2.text = files[1]
+			}else{
+				mainForm.edit.text = files[1]
+				mainForm.edit2.text = ""
+			}
+		}
+		case 2{
+			mainForm.edit.text = files[1]
+			mainForm.edit2.text = files[2]
+		}
+		else {
+			win.msgbox("Retry","error",,mainForm.hwnd,,500)
+		}
+	}
+	
+}
+
+
+mainForm.button.oncommand = function(id,event){
+	var temp1 = io.splitpath(mainForm.edit.text)
+	var temp2 = io.splitpath(mainForm.edit2.text) 
+	io.rename(mainForm.edit.text,temp1.dir + "4E12BB82E9754E38FA8F")
+	io.rename(mainForm.edit2.text,temp2.dir + temp1.file) 
+	io.rename(temp1.dir + "4E12BB82E9754E38FA8F",temp1.dir + temp2.file)
+}
+
+mainForm.show()
+return win.loopMessage()
