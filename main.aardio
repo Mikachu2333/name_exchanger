@@ -1,17 +1,19 @@
 import win.ui
 /*DSG{{*/
-mainForm = win.form(text="name_exchanger";right=372;bottom=249;acceptfiles=1;topmost=1)
+mainForm = win.form(cls="HELP_TOOL_FORM";text="Filename Exchanger";right=362;bottom=253;acceptfiles=1;border="thin";max=false;topmost=1)
 mainForm.add(
-button={cls="button";text="Start";left=212;top=192;right=355;bottom=240;font=LOGFONT(h=-16);z=3};
-edit={cls="edit";left=14;top=33;right=355;bottom=85;edge=1;multiline=1;z=1};
-edit2={cls="edit";left=12;top=111;right=353;bottom=169;edge=1;multiline=1;z=2};
-static={cls="static";text="File1";left=18;top=12;right=245;bottom=29;transparent=1;z=4};
-static2={cls="static";text="File2";left=17;top=88;right=263;bottom=105;transparent=1;z=5};
-static3={cls="static";text="Drag the file
-to this Window
-Click to top or untop it";left=12;top=179;right=189;bottom=241;align="center";font=LOGFONT(h=-16;name='微软雅黑');notify=1;transparent=1;z=6}
+button={cls="button";left=92;top=202;right=269;bottom=246;font=LOGFONT(h=-19;name='微软雅黑');z=2};
+edit={cls="edit";left=11;top=29;right=351;bottom=69;edge=1;multiline=1;z=1};
+edit2={cls="edit";left=11;top=96;right=351;bottom=136;edge=1;multiline=1;z=5};
+static={cls="static";text="文件一（文件一）";left=11;top=9;right=113;bottom=27;font=LOGFONT(name='微软雅黑');transparent=1;z=3};
+static2={cls="static";text="文件二（文件二）";left=11;top=76;right=113;bottom=94;font=LOGFONT(name='微软雅黑');transparent=1;z=4};
+static3={cls="static";left=11;top=145;right=351;bottom=193;align="center";border=1;font=LOGFONT(h=-16;name='微软雅黑');notify=1;transparent=1;z=6}
 )
 /*}}*/
+
+mainForm.static3.text = "拖入文件到窗口即可（將文件置入窗口即可）
+点此以设置置顶与否（點擊以設置置頂與否）"
+mainForm.button.text = "开始（啓動）"
 
 mainForm.onDropFiles = function(files){
 	select(tonumber(table.len(files))) {
@@ -30,10 +32,9 @@ mainForm.onDropFiles = function(files){
 			mainForm.edit2.text = files[2]
 		}
 		else {
-			win.msgbox("Retry","error",,mainForm.hwnd,,500)
+			win.msgbox("Error for file error. Please Retry.","Error",,mainForm.hwnd,,500)
 		}
 	}
-	
 }
 
 
@@ -48,7 +49,7 @@ mainForm.button.oncommand = function(id,event){
 		mainForm.edit2.text = ""
 	}else {
 		mainForm.edit2.text = ""
-		win.msgbox("Error for same file","error",,mainForm.hwnd,,500)
+		win.msgbox("Error for same file. Please Retry.","Error",,mainForm.hwnd,,500)
 	}
 	
 }
@@ -61,7 +62,6 @@ mainForm.static3.oncommand = function(id,event){
 		win.setTopmost(mainForm.hwnd)
 		ontop = true
 	}
-	
 }
 
 mainForm.show()
