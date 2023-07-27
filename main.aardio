@@ -1,68 +1,160 @@
+import fsys.lnk
+import sys.reg
 import win.ui
+import win.ui.tooltip
+import win.util.tray
 /*DSG{{*/
-mainForm = win.form(cls="HELP_TOOL_FORM";text="Filename Exchanger";right=362;bottom=253;acceptfiles=1;border="thin";max=false;topmost=1)
+mainForm = win.form(cls="FEXC_FORM";text="Filename Exchanger";right=362;bottom=244;acceptfiles=1;border="thin";max=false;min=false;mode="popup";sysmenu=false;title=false;topmost=1)
 mainForm.add(
-button={cls="button";left=92;top=202;right=269;bottom=246;font=LOGFONT(h=-19;name='微软雅黑');z=2};
-edit={cls="edit";left=11;top=29;right=351;bottom=69;edge=1;multiline=1;z=1};
-edit2={cls="edit";left=11;top=96;right=351;bottom=136;edge=1;multiline=1;z=5};
-static={cls="static";text="文件一（文件一）";left=11;top=9;right=113;bottom=27;font=LOGFONT(name='微软雅黑');transparent=1;z=3};
-static2={cls="static";text="文件二（文件二）";left=11;top=76;right=113;bottom=94;font=LOGFONT(name='微软雅黑');transparent=1;z=4};
-static3={cls="static";left=11;top=145;right=351;bottom=193;align="center";border=1;font=LOGFONT(h=-16;name='微软雅黑');notify=1;transparent=1;z=6}
+button_start={cls="button";text="启动|啓動";left=205;top=190;right=332;bottom=234;default=1;disabled=1;font=LOGFONT(h=-19;name='微软雅黑');z=3};
+button_tip={cls="plus";text="注意";left=34;top=190;right=161;bottom=234;color=255;font=LOGFONT(h=-18;name='微软雅黑';weight=700);frame=1;notify=1;z=12};
+edit_file1={cls="edit";left=11;top=64;right=351;bottom=104;edge=1;multiline=1;z=2};
+edit_file2={cls="edit";left=11;top=131;right=351;bottom=171;edge=1;multiline=1;z=6};
+static_bg={cls="static";left=0;top=0;right=363;bottom=37;bgcolor=12632256;border=1;z=1};
+static_close={cls="static";text='\u26DD';left=327;top=5;right=354;bottom=32;align="center";bgcolor=0;center=1;color=255;font=LOGFONT(h=-26;name='微软雅黑');notify=1;z=9};
+static_file1={cls="static";text="文件一（文件一）";left=11;top=44;right=113;bottom=62;font=LOGFONT(name='微软雅黑');transparent=1;z=4};
+static_file2={cls="static";text="文件二（文件二）";left=11;top=111;right=113;bottom=129;font=LOGFONT(name='微软雅黑');transparent=1;z=5};
+static_menu={cls="static";text='\u2622';left=217;top=5;right=244;bottom=32;align="center";bgcolor=0;center=1;color=16777215;font=LOGFONT(h=-20;name='微软雅黑');notify=1;z=11};
+static_min={cls="static";text="-";left=291;top=5;right=318;bottom=32;align="center";bgcolor=0;center=1;color=16777215;font=LOGFONT(h=-30;name='微软雅黑');notify=1;z=7};
+static_top={cls="static";text='\u2726';left=254;top=5;right=281;bottom=32;align="center";bgcolor=0;center=1;color=16777215;font=LOGFONT(h=-30;name='微软雅黑');notify=1;z=10};
+static_tray={cls="static";text='\u2693';left=180;top=5;right=207;bottom=32;align="center";bgcolor=0;center=1;color=255;font=LOGFONT(h=-22;name='微软雅黑');notify=1;z=8}
 )
 /*}}*/
 
-mainForm.static3.text = "拖入文件到窗口即可（將文件置入窗口即可）
-点此以设置置顶与否（點擊以設置置頂與否）"
-mainForm.button.text = "开始（啓動）"
+change_main = function(file1,file2){
+	var temp1 = io.splitpath(file1)
+	var temp2 = io.splitpath(file2)
+	var judge = (string.len(file1) > 255) or (string.len(file2) > 255) or (string.len(temp2.dir + temp1.name + temp2.ext) > 255) or (string.len(temp1.dir + temp2.name + temp1.ext) > 255)
+	if(judge){
+		sys.reg.setValue("LongPathsEnabled",1,"SYSTEM\CurrentControlSet\Control\FileSystem",0x80000002/*_HKEY_LOCAL_MACHINE*/)
+		win.msgbox("File name too long, Admin is needed. Please Retry.","Error",,mainForm.hwnd)
+	}	
+	io.rename(file1,temp1.dir + "4E12BB82E9754E38FA8F")
+	io.rename(file2,temp2.dir + temp1.name + temp2.ext) 
+	io.rename(temp1.dir + "4E12BB82E9754E38FA8F",temp1.dir + temp2.name + temp1.ext)
+}
+
+
+var argv_len_judge = table.len(_ARGV) != 0
+if(argv_len_judge != 0){
+	if(argv_len_judge == 2){
+		change_main(_ARGV[1],_ARGV[2])
+	}
+	mainForm.close()
+}else{
+	mainForm.show()
+}
+
+
+var tooltipCtrl = win.ui.tooltip(mainForm)
+var tip_table = {
+	"static_tray" = '创建任务栏图标';
+	"static_menu" = '创建右键菜单-“发送到”选项';
+	"static_top" = '置顶与否';
+	"static_min" = '最小化';
+	"static_close" = '关闭';
+}
+tooltipCtrl.add(tip_table)
+
+lnk_exist = false
+if(io.exist(io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\name_exchanger.lnk"))){
+	lnk_exist = true
+	mainForm.button_start.disabled = false
+}
+
 
 mainForm.onDropFiles = function(files){
 	select(tonumber(table.len(files))) {
-		case 1 {
-			if(mainForm.edit.text == ""){
-				mainForm.edit.text = files[1]
-			}elseif(mainForm.edit2.text == ""){
-				mainForm.edit2.text = files[1]
+		case 1{
+			if(mainForm.edit_file1.text == ""){
+				mainForm.edit_file1.text = files[1]
+			}elseif(mainForm.edit_file2.text == ""){
+				mainForm.edit_file2.text = files[1]
 			}else{
-				mainForm.edit.text = files[1]
-				mainForm.edit2.text = ""
+				mainForm.edit_file1.text = files[1]
+				mainForm.edit_file2.text = ""
 			}
 		}
 		case 2{
-			mainForm.edit.text = files[1]
-			mainForm.edit2.text = files[2]
+			mainForm.edit_file1.text = files[1]
+			mainForm.edit_file2.text = files[2]
 		}
-		else {
+		else{
 			win.msgbox("Error for file error. Please Retry.","Error",,mainForm.hwnd,,500)
 		}
 	}
 }
 
-
-mainForm.button.oncommand = function(id,event){
-	if(mainForm.edit.text != mainForm.edit2.text){
-		var temp1 = io.splitpath(mainForm.edit.text)
-		var temp2 = io.splitpath(mainForm.edit2.text) 
-		io.rename(mainForm.edit.text,temp1.dir + "4E12BB82E9754E38FA8F")
-		io.rename(mainForm.edit2.text,temp2.dir + temp1.name + temp2.ext) 
-		io.rename(temp1.dir + "4E12BB82E9754E38FA8F",temp1.dir + temp2.name + temp1.ext)
-		mainForm.edit.text = ""
-		mainForm.edit2.text = ""
-	}else {
-		mainForm.edit2.text = ""
+mainForm.button_start.oncommand = function(id,event){
+	if(mainForm.edit_file1.text != mainForm.edit_file2.text){
+		change_main(mainForm.edit_file1.text,mainForm.edit_file2.text)
+		mainForm.edit_file1.text = ""
+		mainForm.edit_file2.text = ""	
+	}else{
+		mainForm.edit_file2.text = ""
 		win.msgbox("Error for same file. Please Retry.","Error",,mainForm.hwnd,,500)
 	}
 	
 }
-var ontop = true
-mainForm.static3.oncommand = function(id,event){
-	if(ontop){
-		win.setTopmost(mainForm.hwnd,false)
-		ontop = false
-	}else{
+
+mainForm.onMouseDown  = function(wParam,lParam){
+	mainForm.hitCaption()	
+}
+
+mainForm.static_close.oncommand = function(id,event){
+	mainForm.close()
+}
+
+mainForm.static_top.oncommand = function(id,event){
+	if(mainForm.static_top.text == "✧"){
 		win.setTopmost(mainForm.hwnd)
-		ontop = true
+		mainForm.static_top.text = "✦"
+	}else{
+		win.setTopmost(mainForm.hwnd,false)
+		mainForm.static_top.text = "✧"
 	}
 }
 
-mainForm.show()
+mainForm.static_min.oncommand = function(id,event){
+	mainForm.static_tray.oncommand()
+	mainForm.show(false)
+}
+
+mainForm.onTrayMessage = {
+	[0x202/*_WM_LBUTTONUP*/] = function(wParam){
+		if(win.isVisible(mainForm.hwnd)){
+			mainForm.show(false)
+		}else{
+			mainForm.show(true)
+		}
+	}
+	[0x205/*_WM_RBUTTONUP*/] = function(wParam){
+		mainForm.close()
+	}
+}
+
+mainForm.static_tray.oncommand = function(id,event){
+	mainForm.tray = win.util.tray(mainForm)
+	mainForm.tray.tip = '左键显示/隐藏|||右键退出'
+	mainForm.static_min.disabled = false
+	mainForm.static_tray.disabled = true
+	mainForm.static_tray.hide = true	
+}
+
+mainForm.static_menu.oncommand = function(id,event){
+	if(!lnk_exist){
+		var send_to_lnk = fsys.lnk()
+		lnk.description = "A lnk to filename exchange exe"  
+		lnk.path = io._exepath
+		lnk.setIcon(io._exepath,0)
+		var temp_pth = io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\")
+		lnk.save(temp_pth,"name_exchanger.lnk")
+	}
+}
+
+mainForm.button_tip.oncommand = function(id,event){
+	mainForm.button_start.disabled = false
+	win.msgbox('拖入文件到窗口或程序即可使用，鼠标悬停于右上角图标可获得提示。',"Warning",,mainForm.hwnd)
+}
+
 return win.loopMessage()
