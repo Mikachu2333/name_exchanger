@@ -6,18 +6,18 @@ import win.util.tray
 /*DSG{{*/
 mainForm = win.form(cls="FEXC_FORM";text="Filename Exchanger";right=362;bottom=244;acceptfiles=1;border="thin";max=false;min=false;mode="popup";sysmenu=false;title=false;topmost=1)
 mainForm.add(
-button_start={cls="button";text="启动|啓動";left=205;top=190;right=332;bottom=234;default=1;disabled=1;font=LOGFONT(h=-19;name='微软雅黑');z=3};
-button_tip={cls="plus";text="注意";left=34;top=190;right=161;bottom=234;color=255;font=LOGFONT(h=-18;name='微软雅黑';weight=700);frame=1;notify=1;z=12};
+button_start={cls="button";text="启动 | 啓動";left=205;top=190;right=332;bottom=234;default=1;disabled=1;font=LOGFONT(h=-19;name='微软雅黑');z=3};
+button_tip={cls="plus";text="注意";left=34;top=190;right=161;bottom=234;color=255;font=LOGFONT(h=-20;name='微软雅黑';weight=700);frame=1;notify=1;z=12};
 edit_file1={cls="edit";left=11;top=64;right=351;bottom=104;edge=1;multiline=1;z=2};
 edit_file2={cls="edit";left=11;top=131;right=351;bottom=171;edge=1;multiline=1;z=6};
 static_bg={cls="static";left=0;top=0;right=363;bottom=37;bgcolor=12632256;border=1;z=1};
-static_close={cls="static";text='\u26DD';left=327;top=5;right=354;bottom=32;align="center";bgcolor=0;center=1;color=255;font=LOGFONT(h=-26;name='微软雅黑');notify=1;z=9};
-static_file1={cls="static";text="文件一（文件一）";left=11;top=44;right=113;bottom=62;font=LOGFONT(name='微软雅黑');transparent=1;z=4};
-static_file2={cls="static";text="文件二（文件二）";left=11;top=111;right=113;bottom=129;font=LOGFONT(name='微软雅黑');transparent=1;z=5};
-static_menu={cls="static";text='\u2622';left=217;top=5;right=244;bottom=32;align="center";bgcolor=0;center=1;color=16777215;font=LOGFONT(h=-20;name='微软雅黑');notify=1;z=11};
-static_min={cls="static";text="-";left=291;top=5;right=318;bottom=32;align="center";bgcolor=0;center=1;color=16777215;font=LOGFONT(h=-30;name='微软雅黑');notify=1;z=7};
+static_close={cls="static";text='\u26DD';left=329;top=5;right=356;bottom=32;align="center";bgcolor=0;center=1;color=255;font=LOGFONT(h=-26;name='微软雅黑');notify=1;z=9};
+static_file1={cls="static";text="文件一";left=11;top=44;right=57;bottom=62;font=LOGFONT(name='微软雅黑');transparent=1;z=4};
+static_file2={cls="static";text="文件二";left=11;top=111;right=57;bottom=129;font=LOGFONT(name='微软雅黑');transparent=1;z=5};
+static_menu={cls="static";text='\u2622';left=176;top=5;right=203;bottom=32;align="center";bgcolor=0;center=1;color=16777215;font=LOGFONT(h=-20;name='微软雅黑');notify=1;z=11};
+static_min={cls="static";text="-";left=292;top=5;right=319;bottom=32;align="center";bgcolor=0;center=1;color=16777215;font=LOGFONT(h=-30;name='微软雅黑');notify=1;z=7};
 static_top={cls="static";text='\u2726';left=254;top=5;right=281;bottom=32;align="center";bgcolor=0;center=1;color=16777215;font=LOGFONT(h=-30;name='微软雅黑');notify=1;z=10};
-static_tray={cls="static";text='\u2693';left=180;top=5;right=207;bottom=32;align="center";bgcolor=0;center=1;color=255;font=LOGFONT(h=-22;name='微软雅黑');notify=1;z=8}
+static_tray={cls="static";text='\u2693';left=216;top=5;right=243;bottom=32;align="center";bgcolor=0;center=1;color=255;font=LOGFONT(h=-22;name='微软雅黑');notify=1;z=8}
 )
 /*}}*/
 
@@ -35,13 +35,19 @@ change_main = function(file1,file2){
 }
 
 
-var argv_len_judge = table.len(_ARGV) != 0
+argv_len_judge = table.len(_ARGV)
+lnk_exist = false
 if(argv_len_judge != 0){
 	if(argv_len_judge == 2){
 		change_main(_ARGV[1],_ARGV[2])
 	}
 	mainForm.close()
 }else{
+	if(io.exist(io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\name_exchanger.lnk"))){
+		lnk_exist = true
+		mainForm.static_menu.hide = true
+		mainForm.button_start.disabled = false
+	}
 	mainForm.show()
 }
 
@@ -56,11 +62,7 @@ var tip_table = {
 }
 tooltipCtrl.add(tip_table)
 
-lnk_exist = false
-if(io.exist(io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\name_exchanger.lnk"))){
-	lnk_exist = true
-	mainForm.button_start.disabled = false
-}
+
 
 
 mainForm.onDropFiles = function(files){
