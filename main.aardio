@@ -4,49 +4,54 @@ import win.ui
 import win.ui.tooltip
 import win.util.tray
 /*DSG{{*/
-mainForm = win.form(cls="FEXC_FORM";text="Filename Exchanger";right=362;bottom=244;acceptfiles=1;border="thin";max=false;min=false;mode="popup";sysmenu=false;title=false;topmost=1)
+mainForm = win.form(cls="FEXC_FORM";text="Filename Exchanger";right=362;bottom=242;acceptfiles=1;border="thin";max=false;min=false;mode="popup";sysmenu=false;title=false;topmost=1)
 mainForm.add(
-button_start={cls="button";text="启动 | 啓動";left=205;top=190;right=332;bottom=234;default=1;disabled=1;font=LOGFONT(h=-19;name='微软雅黑');z=3};
-button_tip={cls="plus";text="注意";left=34;top=190;right=161;bottom=234;color=255;font=LOGFONT(h=-20;name='微软雅黑';weight=700);frame=1;notify=1;z=12};
-edit_file1={cls="edit";left=11;top=64;right=351;bottom=104;edge=1;multiline=1;z=2};
-edit_file2={cls="edit";left=11;top=131;right=351;bottom=171;edge=1;multiline=1;z=6};
-static_bg={cls="static";left=0;top=0;right=363;bottom=37;bgcolor=12632256;border=1;z=1};
-static_close={cls="static";text='\u26DD';left=329;top=5;right=356;bottom=32;align="center";bgcolor=0;center=1;color=255;font=LOGFONT(h=-26;name='微软雅黑');notify=1;z=9};
-static_file1={cls="static";text="文件一";left=11;top=44;right=57;bottom=62;font=LOGFONT(name='微软雅黑');transparent=1;z=4};
-static_file2={cls="static";text="文件二";left=11;top=111;right=57;bottom=129;font=LOGFONT(name='微软雅黑');transparent=1;z=5};
-static_menu={cls="static";text='\u2622';left=176;top=5;right=203;bottom=32;align="center";bgcolor=0;center=1;color=16777215;font=LOGFONT(h=-20;name='微软雅黑');notify=1;z=11};
-static_min={cls="static";text="-";left=292;top=5;right=319;bottom=32;align="center";bgcolor=0;center=1;color=16777215;font=LOGFONT(h=-30;name='微软雅黑');notify=1;z=7};
-static_top={cls="static";text='\u2726';left=254;top=5;right=281;bottom=32;align="center";bgcolor=0;center=1;color=16777215;font=LOGFONT(h=-30;name='微软雅黑');notify=1;z=10};
-static_tray={cls="static";text='\u2693';left=216;top=5;right=243;bottom=32;align="center";bgcolor=0;center=1;color=255;font=LOGFONT(h=-22;name='微软雅黑');notify=1;z=8}
+button_start={cls="button";text="启动 | 啓動";left=118;top=182;right=245;bottom=226;default=1;font=LOGFONT(h=-19;name='微软雅黑');z=3};
+edit_file1={cls="edit";left=11;top=59;right=351;bottom=99;edge=1;multiline=1;z=2};
+edit_file2={cls="edit";left=11;top=126;right=351;bottom=166;edge=1;multiline=1;z=6};
+static_bg={cls="static";left=0;top=0;right=363;bottom=33;bgcolor=14120960;z=1};
+static_close={cls="static";text='\u26DD';left=329;top=2;right=356;bottom=29;align="center";center=1;color=16777215;font=LOGFONT(h=-26;name='微软雅黑');notify=1;transparent=1;z=8};
+static_file1={cls="static";text="文件一";left=11;top=39;right=57;bottom=57;font=LOGFONT(name='微软雅黑');transparent=1;z=4};
+static_file2={cls="static";text="文件二";left=11;top=106;right=57;bottom=124;font=LOGFONT(name='微软雅黑');transparent=1;z=5};
+static_menu={cls="static";text='\uD83D\uDEE0\uFE0F';left=256;top=2;right=283;bottom=29;align="center";bgcolor=0;center=1;color=16777215;font=LOGFONT(h=-20;name='微软雅黑');notify=1;transparent=1;z=10};
+static_min={cls="static";text="-";left=292;top=2;right=319;bottom=29;align="center";center=1;color=16777215;font=LOGFONT(h=-30;name='微软雅黑');notify=1;transparent=1;z=7};
+static_tip={cls="static";text='\u2753';left=222;top=2;right=249;bottom=29;align="center";center=1;color=255;font=LOGFONT(h=-22;name='微软雅黑');notify=1;transparent=1;z=11};
+static_top={cls="static";text='\u2693';left=323;top=203;right=363;bottom=243;align="center";center=1;color=255;font=LOGFONT(h=-30;name='微软雅黑');notify=1;transparent=1;z=9}
 )
 /*}}*/
 
 change_main = function(file1,file2){
 	var temp1 = io.splitpath(file1)
 	var temp2 = io.splitpath(file2)
-	var judge = (string.len(file1) > 255) or (string.len(file2) > 255) or (string.len(temp2.dir + temp1.name + temp2.ext) > 255) or (string.len(temp1.dir + temp2.name + temp1.ext) > 255)
+	var original_path_len_judge = (string.len(file1) > 255) or (string.len(file2) > 255)
+	var new_path_len_judge = (string.len(temp2.dir + temp1.name + temp2.ext) > 255) or (string.len(temp1.dir + temp2.name + temp1.ext) > 255)
+	var temp_path_len_judge = (string.len(temp1.dir + "71C4DC3AE3E773C1EF5D3") > 255)
+	var judge = (original_path_len_judge or new_path_len_judge or temp_path_len_judge)
 	if(judge){
 		sys.reg.setValue("LongPathsEnabled",1,"SYSTEM\CurrentControlSet\Control\FileSystem",0x80000002/*_HKEY_LOCAL_MACHINE*/)
 		win.msgbox("File name too long, Admin is needed. Please Retry.","Error",,mainForm.hwnd)
 	}	
-	io.rename(file1,temp1.dir + "4E12BB82E9754E38FA8F")
+	io.rename(file1,temp1.dir + "71C4DC3AE3E773C1EF5D3")
 	io.rename(file2,temp2.dir + temp1.name + temp2.ext) 
-	io.rename(temp1.dir + "4E12BB82E9754E38FA8F",temp1.dir + temp2.name + temp1.ext)
+	io.rename(temp1.dir + "71C4DC3AE3E773C1EF5D3",temp1.dir + temp2.name + temp1.ext)
+}
+
+
+mainForm.static_tip.oncommand = function(id,event){
+	win.msgbox('拖入文件即可使用，软件自动常驻任务栏，悬停鼠标于右上角图\n标可获得提示。\n点击🛠️后将添加“右键菜单-发送到”，支持不打开直接使用。\n如果右键菜单失效，请右键点击🛠。\n\n拖入文件即可使用，軟體自動保持常駐，懸停鼠標於按鈕上可獲\n得提示。\n點擊🛠後可新增功能“右鍵選單-傳送到”，支持直接托拽文件使用。\n如果右鍵選單失效，請右鍵點擊🛠。',"Warning",,mainForm.hwnd)
 }
 
 
 argv_len_judge = table.len(_ARGV)
 lnk_exist = false
-if(argv_len_judge != 0){
-	if(argv_len_judge == 2){
-		change_main(_ARGV[1],_ARGV[2])
-	}
+if(argv_len_judge == 2){
+	change_main(_ARGV[1],_ARGV[2])
 	mainForm.close()
 }else{
 	if(io.exist(io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\name_exchanger.lnk"))){
 		lnk_exist = true
-		mainForm.static_menu.hide = true
-		mainForm.button_start.disabled = false
+	}else{
+		mainForm.static_tip.oncommand()
 	}
 	mainForm.show()
 }
@@ -54,15 +59,15 @@ if(argv_len_judge != 0){
 
 var tooltipCtrl = win.ui.tooltip(mainForm)
 var tip_table = {
-	"static_tray" = '创建任务栏图标';
-	"static_menu" = '创建右键菜单-“发送到”选项';
-	"static_top" = '置顶与否';
+	"static_tip" = '答疑\n\n關於';
+	"static_menu" = '单击以创建右键菜单-“发送到”选项\n右键点击以重建快捷方式\n\n新增至右鍵選單-“傳送到”選項\n點擊右鍵取消';
+	"static_top" = '置顶与否\n\n置頂開關';
 	"static_min" = '最小化';
-	"static_close" = '关闭';
+	"static_close" = '关闭\n\n關閉';
 }
 tooltipCtrl.add(tip_table)
-
-
+mainForm.tray = win.util.tray(mainForm)
+mainForm.tray.tip = '左键显示/隐藏|||右键退出\n左鍵顯示/隱藏|||右鍵退出'
 
 
 mainForm.onDropFiles = function(files){
@@ -108,17 +113,16 @@ mainForm.static_close.oncommand = function(id,event){
 }
 
 mainForm.static_top.oncommand = function(id,event){
-	if(mainForm.static_top.text == "✧"){
+	if(mainForm.static_top.text == "🔱"){
 		win.setTopmost(mainForm.hwnd)
-		mainForm.static_top.text = "✦"
+		mainForm.static_top.text = "⚓"
 	}else{
 		win.setTopmost(mainForm.hwnd,false)
-		mainForm.static_top.text = "✧"
+		mainForm.static_top.text = "🔱"
 	}
 }
 
 mainForm.static_min.oncommand = function(id,event){
-	mainForm.static_tray.oncommand()
 	mainForm.show(false)
 }
 
@@ -135,28 +139,30 @@ mainForm.onTrayMessage = {
 	}
 }
 
-mainForm.static_tray.oncommand = function(id,event){
-	mainForm.tray = win.util.tray(mainForm)
-	mainForm.tray.tip = '左键显示/隐藏|||右键退出'
-	mainForm.static_min.disabled = false
-	mainForm.static_tray.disabled = true
-	mainForm.static_tray.hide = true	
+creat_lnk = function(judge_bool){
+	if(judge_bool){
+		io.remove(io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\name_exchanger.lnk"))
+		win.msgbox("Removed","Tips",,mainForm.hwnd,1000)
+	}
+	var send_to_lnk = fsys.lnk()
+	send_to_lnk.description = "An lnk to filename exchange exe"  
+	send_to_lnk.path = io._exepath
+	send_to_lnk.setIcon(io._exepath,0)
+	var temp_pth = io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\")
+	send_to_lnk.save(temp_pth,"name_exchanger.lnk")
+	win.msgbox("Rebuild","Tips",,mainForm.hwnd,1500)
 }
 
-mainForm.static_menu.oncommand = function(id,event){
-	if(!lnk_exist){
-		var send_to_lnk = fsys.lnk()
-		lnk.description = "A lnk to filename exchange exe"  
-		lnk.path = io._exepath
-		lnk.setIcon(io._exepath,0)
-		var temp_pth = io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\")
-		lnk.save(temp_pth,"name_exchanger.lnk")
+mainForm.static_menu.wndproc = function(hwnd,message,wParam,lParam){
+	select(message){
+		case 0x202/*_WM_LBUTTONUP*/{
+			creat_lnk(false)
+		}
+		case 0x205/*_WM_RBUTTONUP*/{
+			creat_lnk(true)
+		}
 	}
 }
 
-mainForm.button_tip.oncommand = function(id,event){
-	mainForm.button_start.disabled = false
-	win.msgbox('拖入文件到窗口或程序即可使用，鼠标悬停于右上角图标可获得提示。',"Warning",,mainForm.hwnd)
-}
 
 return win.loopMessage()
