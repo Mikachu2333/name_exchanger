@@ -7,12 +7,12 @@ import win.util.tray
 mainForm = win.form(cls="FEXC_FORM";text="Filename Exchanger";right=362;bottom=242;acceptfiles=1;border="thin";max=false;min=false;mode="popup";sysmenu=false;title=false;topmost=1)
 mainForm.add(
 button_start={cls="button";text="启动 | 啓動";left=118;top=182;right=245;bottom=226;default=1;font=LOGFONT(h=-19;name='微软雅黑');z=3};
-edit_file1={cls="edit";left=11;top=59;right=351;bottom=99;edge=1;multiline=1;z=2};
-edit_file2={cls="edit";left=11;top=126;right=351;bottom=166;edge=1;multiline=1;z=6};
+edit_path1={cls="edit";left=11;top=59;right=351;bottom=99;edge=1;multiline=1;z=2};
+edit_path2={cls="edit";left=11;top=126;right=351;bottom=166;edge=1;multiline=1;z=6};
 static_bg={cls="static";left=0;top=0;right=363;bottom=33;bgcolor=14120960;z=1};
 static_close={cls="static";text='\u26DD';left=329;top=2;right=356;bottom=29;align="center";center=1;color=16777215;font=LOGFONT(h=-26;name='微软雅黑');notify=1;transparent=1;z=8};
-static_file1={cls="static";text="文件一";left=11;top=39;right=57;bottom=57;font=LOGFONT(name='微软雅黑');transparent=1;z=4};
-static_file2={cls="static";text="文件二";left=11;top=106;right=57;bottom=124;font=LOGFONT(name='微软雅黑');transparent=1;z=5};
+static_path1={cls="static";text="文件一";left=11;top=39;right=57;bottom=57;font=LOGFONT(name='微软雅黑');transparent=1;z=4};
+static_path2={cls="static";text="文件二";left=11;top=106;right=57;bottom=124;font=LOGFONT(name='微软雅黑');transparent=1;z=5};
 static_menu={cls="static";text='\uD83D\uDEE0\uFE0F';left=256;top=2;right=283;bottom=29;align="center";bgcolor=0;center=1;color=16777215;font=LOGFONT(h=-20;name='微软雅黑');notify=1;transparent=1;z=10};
 static_min={cls="static";text="-";left=292;top=2;right=319;bottom=29;align="center";center=1;color=16777215;font=LOGFONT(h=-30;name='微软雅黑');notify=1;transparent=1;z=7};
 static_tip={cls="static";text='\u2753';left=222;top=2;right=249;bottom=29;align="center";center=1;color=255;font=LOGFONT(h=-22;name='微软雅黑');notify=1;transparent=1;z=11};
@@ -20,20 +20,39 @@ static_top={cls="static";text='\u2693';left=323;top=203;right=363;bottom=243;ali
 )
 /*}}*/
 
-change_main = function(file1,file2){
-	var temp1 = io.splitpath(file1)
-	var temp2 = io.splitpath(file2)
-	var original_path_len_judge = (string.len(file1) > 255) or (string.len(file2) > 255)
+change_main = function(path1,path2){
+	var temp1 = io.splitpath(path1)
+	var temp2 = io.splitpath(path2)
+	var original_path_len_judge = (string.len(path1) > 255) or (string.len(path2) > 255)
 	var new_path_len_judge = (string.len(temp2.dir + temp1.name + temp2.ext) > 255) or (string.len(temp1.dir + temp2.name + temp1.ext) > 255)
 	var temp_path_len_judge = (string.len(temp1.dir + "71C4DC3AE3E773C1EF5D3") > 255)
 	var judge = (original_path_len_judge or new_path_len_judge or temp_path_len_judge)
 	if(judge){
 		sys.reg.setValue("LongPathsEnabled",1,"SYSTEM\CurrentControlSet\Control\FileSystem",0x80000002/*_HKEY_LOCAL_MACHINE*/)
 		win.msgbox("File name too long, Admin is needed. Please Retry.","Error",,mainForm.hwnd)
-	}	
-	io.rename(file1,temp1.dir + "71C4DC3AE3E773C1EF5D3")
-	io.rename(file2,temp2.dir + temp1.name + temp2.ext) 
-	io.rename(temp1.dir + "71C4DC3AE3E773C1EF5D3",temp1.dir + temp2.name + temp1.ext)
+	}
+	
+	if(temp1.dir == path2 + "\"){
+		judge_enum = 1
+	}elseif(temp2.dir == path1 + "\"){
+		judge_enum = 2
+	}else{
+		judge_enum = false
+	}
+	
+	if(judge_enum) and (path1 != temp1.dir + temp2.name){
+		if((judge_enum == 1)){
+			io.rename(path1,temp1.dir + temp2.name)
+			io.rename(path2,temp2.dir + temp1.name)
+		}else{
+			io.rename(path2,temp2.dir + temp1.name)
+			io.rename(path1,temp1.dir + temp2.name)
+		}
+	}else{
+		io.rename(path1,temp1.dir + "71C4DC3AE3E773C1EF5D3")
+		io.rename(path2,temp2.dir + temp1.name + temp2.ext) 
+		io.rename(temp1.dir + "71C4DC3AE3E773C1EF5D3",temp1.dir + temp2.name + temp1.ext)
+	}
 }
 
 
@@ -73,18 +92,18 @@ mainForm.tray.tip = '左键显示/隐藏|||右键退出\n左鍵顯示/隱藏|||�
 mainForm.onDropFiles = function(files){
 	select(tonumber(table.len(files))) {
 		case 1{
-			if(mainForm.edit_file1.text == ""){
-				mainForm.edit_file1.text = files[1]
-			}elseif(mainForm.edit_file2.text == ""){
-				mainForm.edit_file2.text = files[1]
+			if(mainForm.edit_path1.text == ""){
+				mainForm.edit_path1.text = files[1]
+			}elseif(mainForm.edit_path2.text == ""){
+				mainForm.edit_path2.text = files[1]
 			}else{
-				mainForm.edit_file1.text = files[1]
-				mainForm.edit_file2.text = ""
+				mainForm.edit_path1.text = files[1]
+				mainForm.edit_path2.text = ""
 			}
 		}
 		case 2{
-			mainForm.edit_file1.text = files[1]
-			mainForm.edit_file2.text = files[2]
+			mainForm.edit_path1.text = files[1]
+			mainForm.edit_path2.text = files[2]
 		}
 		else{
 			win.msgbox("Error for file error. Please Retry.","Error",,mainForm.hwnd,,500)
@@ -93,12 +112,12 @@ mainForm.onDropFiles = function(files){
 }
 
 mainForm.button_start.oncommand = function(id,event){
-	if(mainForm.edit_file1.text != mainForm.edit_file2.text){
-		change_main(mainForm.edit_file1.text,mainForm.edit_file2.text)
-		mainForm.edit_file1.text = ""
-		mainForm.edit_file2.text = ""	
+	if(mainForm.edit_path1.text != mainForm.edit_path2.text){
+		change_main(mainForm.edit_path1.text,mainForm.edit_path2.text)
+		mainForm.edit_path1.text = ""
+		mainForm.edit_path2.text = ""	
 	}else{
-		mainForm.edit_file2.text = ""
+		mainForm.edit_path2.text = ""
 		win.msgbox("Error for same file. Please Retry.","Error",,mainForm.hwnd,,500)
 	}
 	
