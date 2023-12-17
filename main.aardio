@@ -11,10 +11,10 @@ edit_path1={cls="edit";left=11;top=59;right=351;bottom=99;edge=1;multiline=1;z=2
 edit_path2={cls="edit";left=11;top=126;right=351;bottom=166;edge=1;multiline=1;z=6};
 static_bg={cls="static";left=0;top=0;right=363;bottom=33;bgcolor=14120960;z=1};
 static_close={cls="static";text='\u26DD';left=329;top=2;right=356;bottom=29;align="center";center=1;color=16777215;font=LOGFONT(h=-26;name='微软雅黑');notify=1;transparent=1;z=8};
-static_path1={cls="static";text="文件一";left=11;top=39;right=57;bottom=57;font=LOGFONT(name='微软雅黑');transparent=1;z=4};
-static_path2={cls="static";text="文件二";left=11;top=106;right=57;bottom=124;font=LOGFONT(name='微软雅黑');transparent=1;z=5};
 static_menu={cls="static";text='\uD83D\uDEE0\uFE0F';left=256;top=2;right=283;bottom=29;align="center";bgcolor=0;center=1;color=16777215;font=LOGFONT(h=-20;name='微软雅黑');notify=1;transparent=1;z=10};
 static_min={cls="static";text="-";left=292;top=2;right=319;bottom=29;align="center";center=1;color=16777215;font=LOGFONT(h=-30;name='微软雅黑');notify=1;transparent=1;z=7};
+static_path1={cls="static";text="文件一";left=11;top=39;right=57;bottom=57;font=LOGFONT(name='微软雅黑');transparent=1;z=4};
+static_path2={cls="static";text="文件二";left=11;top=106;right=57;bottom=124;font=LOGFONT(name='微软雅黑');transparent=1;z=5};
 static_tip={cls="static";text='\u2753';left=222;top=2;right=249;bottom=29;align="center";center=1;color=255;font=LOGFONT(h=-22;name='微软雅黑');notify=1;transparent=1;z=11};
 static_top={cls="static";text='\u2693';left=323;top=203;right=363;bottom=243;align="center";center=1;color=255;font=LOGFONT(h=-30;name='微软雅黑');notify=1;transparent=1;z=9}
 )
@@ -25,7 +25,7 @@ change_main = function(path1,path2){
 	var temp2 = io.splitpath(path2)
 	var original_path_len_judge = (string.len(path1) > 255) or (string.len(path2) > 255)
 	var new_path_len_judge = (string.len(temp2.dir + temp1.name + temp2.ext) > 255) or (string.len(temp1.dir + temp2.name + temp1.ext) > 255)
-	var temp_path_len_judge = (string.len(temp1.dir + "71C4DC3AE3E773C1EF5D3") > 255)
+	var temp_path_len_judge = (string.len(temp1.dir + "14AAAA0BDDA3EB1B77A9F") > 255)
 	var judge = (original_path_len_judge or new_path_len_judge or temp_path_len_judge)
 	if(judge){
 		sys.reg.setValue("LongPathsEnabled",1,"SYSTEM\CurrentControlSet\Control\FileSystem",0x80000002/*_HKEY_LOCAL_MACHINE*/)
@@ -49,9 +49,9 @@ change_main = function(path1,path2){
 			io.rename(path1,temp1.dir + temp2.name)
 		}
 	}else{
-		io.rename(path1,temp1.dir + "71C4DC3AE3E773C1EF5D3")
-		io.rename(path2,temp2.dir + temp1.name + temp2.ext) 
-		io.rename(temp1.dir + "71C4DC3AE3E773C1EF5D3",temp1.dir + temp2.name + temp1.ext)
+		io.rename(path1,temp1.dir + "14AAAA0BDDA3EB1B77A9F")
+		io.rename(path2,temp2.dir + temp1.name + temp2.ext)
+		io.rename(temp1.dir + "14AAAA0BDDA3EB1B77A9F",temp1.dir + temp2.name + temp1.ext)
 	}
 }
 
@@ -162,14 +162,15 @@ creat_lnk = function(judge_bool){
 	if(judge_bool){
 		io.remove(io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\name_exchanger.lnk"))
 		win.msgbox("Removed","Tips",,mainForm.hwnd,1000)
+	}else{
+		var send_to_lnk = fsys.lnk()
+		send_to_lnk.description = "An lnk to filename exchange exe"
+		send_to_lnk.path = io._exepath
+		send_to_lnk.setIcon(io._exepath,0)
+		var temp_pth = io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\")
+		send_to_lnk.save(temp_pth,"name_exchanger.lnk")
+		win.msgbox("Rebuild","Tips",,mainForm.hwnd,1500)
 	}
-	var send_to_lnk = fsys.lnk()
-	send_to_lnk.description = "An lnk to filename exchange exe"  
-	send_to_lnk.path = io._exepath
-	send_to_lnk.setIcon(io._exepath,0)
-	var temp_pth = io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\")
-	send_to_lnk.save(temp_pth,"name_exchanger.lnk")
-	win.msgbox("Rebuild","Tips",,mainForm.hwnd,1500)
 }
 
 mainForm.static_menu.wndproc = function(hwnd,message,wParam,lParam){
