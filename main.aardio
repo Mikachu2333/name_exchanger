@@ -57,23 +57,36 @@ change_main = function(path1,path2){
 
 
 mainForm.static_tip.oncommand = function(id,event){
-	win.msgbox('拖入文件即可使用，软件自动常驻任务栏，悬停鼠标于右上角图\n标可获得提示。\n点击🛠️后将添加“右键菜单-发送到”，支持不打开直接使用。\n如果右键菜单失效，请右键点击🛠。\n\n拖入文件即可使用，軟體自動保持常駐，懸停鼠標於按鈕上可獲\n得提示。\n點擊🛠後可新增功能“右鍵選單-傳送到”，支持直接托拽文件使用。\n如果右鍵選單失效，請右鍵點擊🛠。',"Warning",,mainForm.hwnd)
+	win.msgbox("拖入文件即可使用，软件自动常驻任务栏，悬停鼠标于右上角图标
+可获得提示。
+点击🛠️后将添加“右键菜单-发送到”，支持不打开直接使用。
+如果右键菜单失效，请右键点击🛠。
+右下角⚓/🔱可设置置顶与否。
+
+拖入文件即可使用，軟體自動保持常駐，懸停鼠標於按鈕上可獲得提
+示。
+點擊🛠後可新增功能“右鍵選單-傳送到”，支持直接托拽文件使用。
+如果右鍵選單失效，請右鍵點擊🛠。
+右下方⚓/🔱為置頂開關。","Warning",,mainForm.hwnd)
 }
 
 
 argv_len_judge = table.len(_ARGV)
-lnk_exist = false
-if(argv_len_judge == 2){
-	change_main(_ARGV[1],_ARGV[2])
-	mainForm.close()
-}else{
+if(argv_len_judge == 0){
 	if(io.exist(io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\name_exchanger.lnk"))){
 		lnk_exist = true
 	}else{
-		mainForm.static_tip.oncommand()
+		lnk_exist = false
 	}
 	mainForm.show()
+}elseif(argv_len_judge == 2){
+	change_main(_ARGV[1],_ARGV[2])
+	mainForm.close()
+}else{
+	win.msgbox("Error for file error. Please Retry.","Error",,,1000)
+	mainForm.close()
 }
+
 
 
 var tooltipCtrl = win.ui.tooltip(mainForm)
