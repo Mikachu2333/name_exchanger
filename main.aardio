@@ -79,7 +79,7 @@ if(argv_len_judge == 2){
 var tooltipCtrl = win.ui.tooltip(mainForm)
 var tip_table = {
 	"static_tip" = '答疑\n\n關於';
-	"static_menu" = '单击以创建右键菜单-“发送到”选项\n右键点击以重建快捷方式\n\n新增至右鍵選單-“傳送到”選項\n點擊右鍵取消';
+	"static_menu" = '单击以创建右键菜单-“发送到”选项\n右键点击以删除原快捷方式\n\n新增至右鍵選單-“傳送到”選項\n點擊右鍵取消';
 	"static_top" = '置顶与否\n\n置頂開關';
 	"static_min" = '最小化';
 	"static_close" = '关闭\n\n關閉';
