@@ -70,13 +70,16 @@ mainForm.static_tip.oncommand = function(id,event){
 右下方⚓/🔱為置頂開關。","Warning",,mainForm.hwnd)
 }
 
-
 argv_len_judge = table.len(_ARGV)
 if(argv_len_judge == 0){
 	if(io.exist(io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\name_exchanger.lnk"))){
 		lnk_exist = true
 	}else{
 		lnk_exist = false
+	}
+	if(io.splitpath(io._exefile).ext == ".EXE"){
+		io.rename(io._exepath,io._exedir + io.splitpath(io._exepath).name + ".exe")
+		mainForm.static_tip.oncommand()
 	}
 	mainForm.show()
 }elseif(argv_len_judge == 2){
