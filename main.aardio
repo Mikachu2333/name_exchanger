@@ -77,7 +77,7 @@ if(argv_len_judge == 0){
 	}else{
 		lnk_exist = false
 	}
-	if(io.splitpath(io._exefile).ext == ".EXE"){
+	if(io.splitpath(io._exefile).ext != ".exe"){
 		io.rename(io._exepath,io._exedir + io.splitpath(io._exepath).name + ".exe")
 		mainForm.static_tip.oncommand()
 	}
