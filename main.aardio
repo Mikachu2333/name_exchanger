@@ -1,5 +1,4 @@
 import fsys.lnk
-import sys.reg
 import win.ui
 import win.ui.tooltip
 import win.util.tray
@@ -21,37 +20,58 @@ static_top={cls="static";text='\u2693';left=323;top=203;right=363;bottom=243;ali
 /*}}*/
 
 change_main = function(path1,path2){
+	path1_dir = fsys.isDir(path1)
+	path2_dir = fsys.isDir(path2)
+	
 	var temp1 = io.splitpath(path1)
 	var temp2 = io.splitpath(path2)
+	
+	var temp1_dir = temp1.dir
+	var temp1_name = temp1.name
+	var temp2_dir = temp2.dir
+	var temp2_name = temp2.name
+	if(path1_dir){
+		temp1_name = temp1.name + temp1.ext
+		var temp1_ext = ""
+	}else{
+		var temp1_ext = temp1.ext
+	}
+	if(path2_dir){
+		temp2_name = temp2.name + temp2.ext
+		var temp2_ext = ""
+	}else{
+		var temp2_ext = temp2.ext
+	}
+	
 	var original_path_len_judge = (string.len(path1) > 255) or (string.len(path2) > 255)
 	var new_path_len_judge = (string.len(temp2.dir + temp1.name + temp2.ext) > 255) or (string.len(temp1.dir + temp2.name + temp1.ext) > 255)
-	var temp_path_len_judge = (string.len(temp1.dir + "14AAAA0BDDA3EB1B77A9F") > 255)
+	var temp_path_len_judge = (string.len(temp1.dir + "FB4715869C140FF1256EB2") > 255)
 	var judge = (original_path_len_judge or new_path_len_judge or temp_path_len_judge)
 	if(judge){
-		sys.reg.setValue("LongPathsEnabled",1,"SYSTEM\CurrentControlSet\Control\FileSystem",0x80000002/*_HKEY_LOCAL_MACHINE*/)
-		win.msgbox("File name too long, Admin is needed. Please Retry.","Error",,mainForm.hwnd)
+		win.msgbox("Name is too long to set. Please Remove the Limit.","Error",,mainForm.hwnd)
 	}
 	
-	if(temp1.dir == path2 + "\"){
-		judge_enum = 1
-	}elseif(temp2.dir == path1 + "\"){
-		judge_enum = 2
+	
+	if(temp1_dir == path2 + "\"){
+		::judge_enum = 1
+	}elseif(temp2_dir == path1 + "\"){
+		::judge_enum = 2
 	}else{
-		judge_enum = false
+		::judge_enum = false
 	}
-	
-	if(judge_enum) and (path1 != temp1.dir + temp2.name){
+
+	if(judge_enum) and (path1 != temp1_dir + temp2_name){
 		if((judge_enum == 1)){
-			io.rename(path1,temp1.dir + temp2.name)
-			io.rename(path2,temp2.dir + temp1.name)
+			io.rename(path1,temp1_dir + temp2_name)
+			io.rename(path2,temp2_dir + temp1_name)
 		}else{
-			io.rename(path2,temp2.dir + temp1.name)
-			io.rename(path1,temp1.dir + temp2.name)
+			io.rename(path2,temp2_dir + temp1_name)
+			io.rename(path1,temp1_dir + temp2_name)
 		}
 	}else{
-		io.rename(path1,temp1.dir + "14AAAA0BDDA3EB1B77A9F")
-		io.rename(path2,temp2.dir + temp1.name + temp2.ext)
-		io.rename(temp1.dir + "14AAAA0BDDA3EB1B77A9F",temp1.dir + temp2.name + temp1.ext)
+		io.rename(path1,temp1_dir + "FB4715869C140FF1256EB2")
+		io.rename(path2,temp2_dir + temp1_name + temp2_ext)
+		io.rename(temp1.dir + "FB4715869C140FF1256EB2",temp1_dir + temp2_name + temp1_ext)
 	}
 }
 
