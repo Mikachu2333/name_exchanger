@@ -28,19 +28,17 @@ change_main = function(path1,path2){
 	
 	var temp1_dir = temp1.dir
 	var temp1_name = temp1.name
+	var temp1_ext = temp1.ext
 	var temp2_dir = temp2.dir
 	var temp2_name = temp2.name
+	var temp2_ext = temp2.ext
 	if(path1_dir){
 		temp1_name = temp1.name + temp1.ext
-		var temp1_ext = ""
-	}else{
-		var temp1_ext = temp1.ext
+		temp1_ext = ""
 	}
 	if(path2_dir){
 		temp2_name = temp2.name + temp2.ext
-		var temp2_ext = ""
-	}else{
-		var temp2_ext = temp2.ext
+		temp2_ext = ""
 	}
 	
 	var original_path_len_judge = (string.len(path1) > 255) or (string.len(path2) > 255)
@@ -51,22 +49,27 @@ change_main = function(path1,path2){
 		win.msgbox("Name is too long to set. Please Remove the Limit.","Error",,mainForm.hwnd)
 	}
 	
-	
-	if(temp1_dir == path2 + "\"){
-		::judge_enum = 1
-	}elseif(temp2_dir == path1 + "\"){
-		::judge_enum = 2
+	var temp1_isenum,temp_null1 = string.indexOf(temp1_dir,path2 + "\")
+	var temp2_isenum,temp_null2 = string.indexOf(temp2_dir,path1 + "\")
+	if(temp1_isenum){
+		judge_enum = 1
+	}elseif(temp2_isenum){
+		judge_enum = 2
 	}else{
-		::judge_enum = false
+		judge_enum = false
 	}
-
+	io.open()
+	io.print(judge_enum)
+	
 	if(judge_enum) and (path1 != temp1_dir + temp2_name){
 		if((judge_enum == 1)){
-			io.rename(path1,temp1_dir + temp2_name)
+			io.rename(path1,temp1_dir + temp2_name + temp1_ext)
 			io.rename(path2,temp2_dir + temp1_name)
+			io.print("1",path1,temp1_dir + temp2_name,temp2_dir + temp1_name)
 		}else{
-			io.rename(path2,temp2_dir + temp1_name)
+			io.rename(path2,temp2_dir + temp1_name + temp2_ext)
 			io.rename(path1,temp1_dir + temp2_name)
+			io.print("2",path2,temp2_dir + temp1_name,temp1_dir + temp2_name)
 		}
 	}else{
 		io.rename(path1,temp1_dir + "FB4715869C140FF1256EB2")
