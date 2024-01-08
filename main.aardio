@@ -26,18 +26,18 @@ change_main = function(path1,path2){
 	var temp1 = io.splitpath(path1)
 	var temp2 = io.splitpath(path2)
 	
-	var temp1_dir = temp1.dir
-	var temp1_name = temp1.name
-	var temp1_ext = temp1.ext
-	var temp2_dir = temp2.dir
-	var temp2_name = temp2.name
-	var temp2_ext = temp2.ext
+	temp1_dir = temp1.dir
+	temp1_name = tostring(temp1.name)
+	temp1_ext = tostring(temp1.ext)
+	temp2_dir = temp2.dir
+	temp2_name = tostring(temp2.name)
+	temp2_ext = tostring(temp2.ext)
 	if(path1_dir){
-		temp1_name = temp1.name + temp1.ext
+		temp1_name = tostring(temp1.name + temp1.ext)
 		temp1_ext = ""
 	}
 	if(path2_dir){
-		temp2_name = temp2.name + temp2.ext
+		temp2_name = tostring(temp2.name + temp2.ext)
 		temp2_ext = ""
 	}
 	
