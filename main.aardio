@@ -58,18 +58,14 @@ change_main = function(path1,path2){
 	}else{
 		judge_enum = false
 	}
-	io.open()
-	io.print(judge_enum)
 	
 	if(judge_enum) and (path1 != temp1_dir + temp2_name){
 		if((judge_enum == 1)){
 			io.rename(path1,temp1_dir + temp2_name + temp1_ext)
 			io.rename(path2,temp2_dir + temp1_name)
-			io.print("1",path1,temp1_dir + temp2_name,temp2_dir + temp1_name)
 		}else{
 			io.rename(path2,temp2_dir + temp1_name + temp2_ext)
 			io.rename(path1,temp1_dir + temp2_name)
-			io.print("2",path2,temp2_dir + temp1_name,temp1_dir + temp2_name)
 		}
 	}else{
 		io.rename(path1,temp1_dir + "FB4715869C140FF1256EB2")
