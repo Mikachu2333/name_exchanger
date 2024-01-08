@@ -42,8 +42,8 @@ change_main = function(path1,path2){
 	}
 	
 	var original_path_len_judge = (string.len(path1) > 255) or (string.len(path2) > 255)
-	var new_path_len_judge = (string.len(temp2.dir + temp1.name + temp2.ext) > 255) or (string.len(temp1.dir + temp2.name + temp1.ext) > 255)
-	var temp_path_len_judge = (string.len(temp1.dir + "FB4715869C140FF1256EB2") > 255)
+	var new_path_len_judge = (string.len(temp2_dir + temp1_name + temp2_ext) > 255) or (string.len(temp1_dir + temp2_name + temp1_ext) > 255)
+	var temp_path_len_judge = (string.len(temp1_dir + "B5432981E3D3E8279B8616") > 255)
 	var judge = (original_path_len_judge or new_path_len_judge or temp_path_len_judge)
 	if(judge){
 		win.msgbox("Name is too long to set. Please Remove the Limit.","Error",,mainForm.hwnd)
@@ -68,9 +68,9 @@ change_main = function(path1,path2){
 			io.rename(path1,temp1_dir + temp2_name)
 		}
 	}else{
-		io.rename(path1,temp1_dir + "FB4715869C140FF1256EB2")
+		io.rename(path1,temp1_dir + "B5432981E3D3E8279B8616")
 		io.rename(path2,temp2_dir + temp1_name + temp2_ext)
-		io.rename(temp1.dir + "FB4715869C140FF1256EB2",temp1_dir + temp2_name + temp1_ext)
+		io.rename(temp1_dir + "B5432981E3D3E8279B8616",temp1_dir + temp2_name + temp1_ext)
 	}
 }
 
