@@ -5,9 +5,9 @@ import win.util.tray
 /*DSG{{*/
 mainForm = win.form(cls="FEXC_FORM";text="Filename Exchanger";right=362;bottom=242;acceptfiles=1;border="thin";max=false;min=false;mode="popup";sysmenu=false;title=false;topmost=1)
 mainForm.add(
-button_start={cls="button";text="启动 | 啓動";left=118;top=182;right=245;bottom=226;default=1;font=LOGFONT(h=-19;name='微软雅黑');z=3};
-edit_path1={cls="edit";left=11;top=59;right=351;bottom=99;edge=1;multiline=1;z=2};
-edit_path2={cls="edit";left=11;top=126;right=351;bottom=166;edge=1;multiline=1;z=6};
+button_start={cls="button";text="启动 | 啓動";left=118;top=183;right=245;bottom=227;default=1;font=LOGFONT(h=-19;name='微软雅黑');z=3};
+edit_path1={cls="edit";left=11;top=59;right=351;bottom=99;edge=1;z=2};
+edit_path2={cls="edit";left=11;top=126;right=351;bottom=166;edge=1;z=6};
 static_bg={cls="static";left=0;top=0;right=363;bottom=33;bgcolor=14120960;z=1};
 static_close={cls="static";text='\u26DD';left=329;top=2;right=356;bottom=29;align="center";center=1;color=16777215;font=LOGFONT(h=-26;name='微软雅黑');notify=1;transparent=1;z=8};
 static_menu={cls="static";text='\uD83D\uDEE0\uFE0F';left=256;top=2;right=283;bottom=29;align="center";bgcolor=0;center=1;color=16777215;font=LOGFONT(h=-20;name='微软雅黑');notify=1;transparent=1;z=10};
@@ -43,7 +43,7 @@ change_main = function(path1,path2){
 	
 	var original_path_len_judge = (string.len(path1) > 255) or (string.len(path2) > 255)
 	var new_path_len_judge = (string.len(temp2_dir + temp1_name + temp2_ext) > 255) or (string.len(temp1_dir + temp2_name + temp1_ext) > 255)
-	var temp_path_len_judge = (string.len(temp1_dir + "B5432981E3D3E8279B8616") > 255)
+	var temp_path_len_judge = (string.len(temp1_dir + "4B4B9C83A63514BE1C7E8D") > 255)
 	var judge = (original_path_len_judge or new_path_len_judge or temp_path_len_judge)
 	if(judge){
 		win.msgbox("Name is too long to set. Please Remove the Limit.","Error",,mainForm.hwnd)
@@ -68,9 +68,9 @@ change_main = function(path1,path2){
 			io.rename(path1,temp1_dir + temp2_name)
 		}
 	}else{
-		io.rename(path1,temp1_dir + "B5432981E3D3E8279B8616")
+		io.rename(path1,temp1_dir + "4B4B9C83A63514BE1C7E8D")
 		io.rename(path2,temp2_dir + temp1_name + temp2_ext)
-		io.rename(temp1_dir + "B5432981E3D3E8279B8616",temp1_dir + temp2_name + temp1_ext)
+		io.rename(temp1_dir + "4B4B9C83A63514BE1C7E8D",temp1_dir + temp2_name + temp1_ext)
 	}
 }
 
