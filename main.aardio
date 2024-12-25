@@ -1,4 +1,5 @@
 import fsys.lnk
+import crypt
 import win.ui
 import win.ui.tooltip
 import win.util.tray
@@ -15,65 +16,11 @@ static_min={cls="static";text="-";left=292;top=2;right=319;bottom=29;align="cent
 static_path1={cls="static";text="文件一";left=11;top=39;right=57;bottom=57;font=LOGFONT(name='微软雅黑');transparent=1;z=4};
 static_path2={cls="static";text="文件二";left=11;top=106;right=57;bottom=124;font=LOGFONT(name='微软雅黑');transparent=1;z=5};
 static_tip={cls="static";text='\u2753';left=222;top=2;right=249;bottom=29;align="center";center=1;color=255;font=LOGFONT(h=-22;name='微软雅黑');notify=1;transparent=1;z=11};
-static_top={cls="static";text='\u2693';left=323;top=203;right=363;bottom=243;align="center";center=1;color=255;font=LOGFONT(h=-30;name='微软雅黑');notify=1;transparent=1;z=9}
+static_top={cls="static";text='\u2693';left=4;top=2;right=31;bottom=29;align="center";center=1;color=65535;font=LOGFONT(h=-24;name='微软雅黑');notify=1;transparent=1;z=9}
 )
 /*}}*/
 
-change_main = function(path1,path2){
-	path1_dir = fsys.isDir(path1)
-	path2_dir = fsys.isDir(path2)
-	
-	var temp1 = io.splitpath(path1)
-	var temp2 = io.splitpath(path2)
-	
-	temp1_dir = temp1.dir
-	temp1_name = tostring(temp1.name)
-	temp1_ext = tostring(temp1.ext)
-	temp2_dir = temp2.dir
-	temp2_name = tostring(temp2.name)
-	temp2_ext = tostring(temp2.ext)
-	if(path1_dir){
-		temp1_name = tostring(temp1.name + temp1.ext)
-		temp1_ext = ""
-	}
-	if(path2_dir){
-		temp2_name = tostring(temp2.name + temp2.ext)
-		temp2_ext = ""
-	}
-	
-	var original_path_len_judge = (string.len(path1) > 255) or (string.len(path2) > 255)
-	var new_path_len_judge = (string.len(temp2_dir + temp1_name + temp2_ext) > 255) or (string.len(temp1_dir + temp2_name + temp1_ext) > 255)
-	var temp_path_len_judge = (string.len(temp1_dir + "4B4B9C83A63514BE1C7E8D") > 255)
-	var judge = (original_path_len_judge or new_path_len_judge or temp_path_len_judge)
-	if(judge){
-		win.msgbox("Name is too long to set. Please Remove the Limit.","Error",,mainForm.hwnd)
-	}
-	
-	var temp1_isenum,temp_null1 = string.indexOf(temp1_dir,path2 + "\")
-	var temp2_isenum,temp_null2 = string.indexOf(temp2_dir,path1 + "\")
-	if(temp1_isenum){
-		judge_enum = 1
-	}elseif(temp2_isenum){
-		judge_enum = 2
-	}else{
-		judge_enum = false
-	}
-	
-	if(judge_enum) and (path1 != temp1_dir + temp2_name){
-		if((judge_enum == 1)){
-			io.rename(path1,temp1_dir + temp2_name + temp1_ext)
-			io.rename(path2,temp2_dir + temp1_name)
-		}else{
-			io.rename(path2,temp2_dir + temp1_name + temp2_ext)
-			io.rename(path1,temp1_dir + temp2_name)
-		}
-	}else{
-		io.rename(path1,temp1_dir + "4B4B9C83A63514BE1C7E8D")
-		io.rename(path2,temp2_dir + temp1_name + temp2_ext)
-		io.rename(temp1_dir + "4B4B9C83A63514BE1C7E8D",temp1_dir + temp2_name + temp1_ext)
-	}
-}
-
+rename_dll := raw.loadDll($"name_exchanger_rs.dll",,"cdecl")
 
 mainForm.static_tip.oncommand = function(id,event){
 	win.msgbox("拖入文件即可使用，软件自动常驻任务栏，悬停鼠标于右上角图标
@@ -102,13 +49,14 @@ if(argv_len_judge == 0){
 	}
 	mainForm.show()
 }elseif(argv_len_judge == 2){
-	change_main(_ARGV[1],_ARGV[2])
+	io.open()
+	result = rename_dll.exchange(_ARGV[1],_ARGV[2])
+	io.print(result)
 	mainForm.close()
 }else{
 	win.msgbox("Error for file error. Please Retry.","Error",,,1000)
 	mainForm.close()
 }
-
 
 
 var tooltipCtrl = win.ui.tooltip(mainForm)
@@ -146,16 +94,22 @@ mainForm.onDropFiles = function(files){
 	}
 }
 
+//io.open()
 mainForm.button_start.oncommand = function(id,event){
-	if(mainForm.edit_path1.text != mainForm.edit_path2.text){
-		change_main(mainForm.edit_path1.text,mainForm.edit_path2.text)
+	result = rename_dll.exchange(mainForm.edit_path1.text,mainForm.edit_path2.text)
+	//io.print(result)
+	if(result == 0){
 		mainForm.edit_path1.text = ""
-		mainForm.edit_path2.text = ""	
-	}else{
 		mainForm.edit_path2.text = ""
-		win.msgbox("Error for same file. Please Retry.","Error",,mainForm.hwnd,,500)
+	}elseif(result == 1){
+		win.msgbox("No Exist","Error",,mainForm.hwnd,,2000)
+	}elseif(result == 2){
+		win.msgbox("Permission Denied","Error",,mainForm.hwnd,,2000)
+	}elseif(result == 3){
+		win.msgbox("New File Already Exists","Error",,mainForm.hwnd,,2000)
+	}else {
+		win.msgbox("UNKNOWN ERROR","Error",,mainForm.hwnd,,2000)
 	}
-	
 }
 
 mainForm.onMouseDown  = function(wParam,lParam){
