@@ -1,5 +1,6 @@
+//RUN\\AS//
 import fsys.lnk
-import crypt
+//import win.messageFilter
 import win.ui
 import win.ui.tooltip
 import win.util.tray
@@ -19,6 +20,10 @@ static_tip={cls="static";text='\u2753';left=222;top=2;right=249;bottom=29;align=
 static_top={cls="static";text='\u2693';left=4;top=2;right=31;bottom=29;align="center";center=1;color=65535;font=LOGFONT(h=-24;name='微软雅黑');notify=1;transparent=1;z=9}
 )
 /*}}*/
+
+//win.messageFilter.change(mainForm.hwnd,1/*_MSGFLT_ADD*/,0x4A/*_WM_COPYDATA*/,0x233/*_WM_DROPFILES*/,0x0049/*_WM_COPYGLOBALDATA*/ )
+
+//io.open()
 
 rename_dll := raw.loadDll($"name_exchanger_rs.dll",,"cdecl")
 
@@ -58,7 +63,6 @@ if(argv_len_judge == 0){
 	mainForm.close()
 }
 
-
 var tooltipCtrl = win.ui.tooltip(mainForm)
 var tip_table = {
 	"static_tip" = '答疑\n\n關於';
@@ -89,12 +93,11 @@ mainForm.onDropFiles = function(files){
 			mainForm.edit_path2.text = files[2]
 		}
 		else{
-			win.msgbox("Error for file error. Please Retry.","Error",,mainForm.hwnd,,500)
+			win.msgbox("Error for file error. Please Retry.","Error",,mainForm.hwnd,500)
 		}
 	}
 }
 
-//io.open()
 mainForm.button_start.oncommand = function(id,event){
 	result = rename_dll.exchange(mainForm.edit_path1.text,mainForm.edit_path2.text)
 	//io.print(result)
@@ -102,13 +105,13 @@ mainForm.button_start.oncommand = function(id,event){
 		mainForm.edit_path1.text = ""
 		mainForm.edit_path2.text = ""
 	}elseif(result == 1){
-		win.msgbox("No Exist","Error",,mainForm.hwnd,,2000)
+		win.msgbox("No Exist","Error",,mainForm.hwnd,2000)
 	}elseif(result == 2){
-		win.msgbox("Permission Denied","Error",,mainForm.hwnd,,2000)
+		win.msgbox("Permission Denied","Error",,mainForm.hwnd,2000)
 	}elseif(result == 3){
-		win.msgbox("New File Already Exists","Error",,mainForm.hwnd,,2000)
+		win.msgbox("New File Already Exists","Error",,mainForm.hwnd,2000)
 	}else {
-		win.msgbox("UNKNOWN ERROR","Error",,mainForm.hwnd,,2000)
+		win.msgbox("UNKNOWN ERROR","Error",,mainForm.hwnd,2000)
 	}
 }
 

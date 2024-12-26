@@ -6,7 +6,7 @@ config  = fsys.config("/config/");
 //不需要序列化的配置名字前请添加下划线
 namespace config {
 	__appName = "应用程序名";
-	__website = "http://www.aardio.com/";
+	website = "https://github.com/Mikachu2333/name_exchanger";
 }
 
 /**intellisense(config)
