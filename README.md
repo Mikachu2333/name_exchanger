@@ -25,3 +25,6 @@
 
 ![图片](https://github.com/Mikachu2333/name_exchanger/assets/63829496/e444b75d-c7b2-462e-86c3-d73a49749c82)
 
+# Lib
+https://github.com/Mikachu2333/name_exchanger_rslib
+
