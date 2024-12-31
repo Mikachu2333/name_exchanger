@@ -1,11 +1,11 @@
-//RUN\\AS//
+//RUNAS//
 import fsys.lnk
-//import win.messageFilter
+import win.messageFilter
 import win.ui
 import win.ui.tooltip
 import win.util.tray
 /*DSG{{*/
-mainForm = win.form(cls="FEXC_FORM";text="Filename Exchanger";right=362;bottom=242;acceptfiles=1;border="thin";max=false;min=false;mode="popup";sysmenu=false;title=false;topmost=1)
+mainForm = win.form(cls="FEXC_FORM";text="Filename Exchanger";right=362;bottom=242;acceptfiles=1;border="thin";exmode="toolwindow";max=false;min=false;mode="popup";sysmenu=false;title=false;topmost=1)
 mainForm.add(
 button_start={cls="button";text="启动 | 啓動";left=118;top=183;right=245;bottom=227;default=1;font=LOGFONT(h=-19;name='微软雅黑');z=3};
 edit_path1={cls="edit";left=11;top=59;right=351;bottom=99;edge=1;z=2};
@@ -21,7 +21,7 @@ static_top={cls="static";text='\u2693';left=4;top=2;right=31;bottom=29;align="ce
 )
 /*}}*/
 
-//win.messageFilter.change(mainForm.hwnd,1/*_MSGFLT_ADD*/,0x4A/*_WM_COPYDATA*/,0x233/*_WM_DROPFILES*/,0x0049/*_WM_COPYGLOBALDATA*/ )
+win.messageFilter.change(mainForm.hwnd,1/*_MSGFLT_ADD*/,0x4A/*_WM_COPYDATA*/,0x233/*_WM_DROPFILES*/,0x0049/*_WM_COPYGLOBALDATA*/ )
 
 //io.open()
 
@@ -54,9 +54,9 @@ if(argv_len_judge == 0){
 	}
 	mainForm.show()
 }elseif(argv_len_judge == 2){
-	io.open()
+	//io.open()
 	result = rename_dll.exchange(_ARGV[1],_ARGV[2])
-	io.print(result)
+	//io.print(result)
 	mainForm.close()
 }else{
 	win.msgbox("Error for file error. Please Retry.","Error",,,1000)
