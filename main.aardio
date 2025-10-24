@@ -21,7 +21,19 @@ static_top={cls="static";text='\u2693';left=4;top=2;right=31;bottom=29;align="ce
 )
 /*}}*/
 
+
 //io.open()
+
+
+exe_ext = io.splitpath(io._exefile).ext
+
+if(exe_ext == ".EXE" and (not process.admin.isRunAs())){
+    process.admin.runas()
+    return ; 
+}elseif(process.admin.isRunAs()){
+    import win.messageFilter
+    win.messageFilter.change(mainForm.hwnd,1/*_MSGFLT_ADD*/,0x4A/*_WM_COPYDATA*/,0x233/*_WM_DROPFILES*/,0x0049/*_WM_COPYGLOBALDATA*/ )
+}
 
 
 var mutex = process.mutex("8B4844A9A108480A925319C27F942274")
@@ -29,13 +41,6 @@ if(mutex.conflict){
     return
 }
 
-exe_ext = io.splitpath(io._exefile).ext
-
-if(exe_ext == ".EXE"){
-    process.admin.runas()
-    import win.messageFilter
-    win.messageFilter.change(mainForm.hwnd,1/*_MSGFLT_ADD*/,0x4A/*_WM_COPYDATA*/,0x233/*_WM_DROPFILES*/,0x0049/*_WM_COPYGLOBALDATA*/ )
-}
 
 rename_dll := raw.loadDll($"name_exchanger_rs.dll",,"cdecl")
 
