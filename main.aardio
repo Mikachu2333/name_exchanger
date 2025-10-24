@@ -1,9 +1,9 @@
-//RUN\\AS//
 import fsys.lnk
-//import win.messageFilter
 import win.ui
 import win.ui.tooltip
 import win.util.tray
+import process.admin
+import process.mutex
 /*DSG{{*/
 mainForm = win.form(cls="FEXC_FORM";text="Filename Exchanger";right=362;bottom=242;acceptfiles=1;border="thin";exmode="toolwindow";max=false;min=false;mode="popup";sysmenu=false;title=false;topmost=1)
 mainForm.add(
@@ -21,14 +21,26 @@ static_top={cls="static";text='\u2693';left=4;top=2;right=31;bottom=29;align="ce
 )
 /*}}*/
 
-//win.messageFilter.change(mainForm.hwnd,1/*_MSGFLT_ADD*/,0x4A/*_WM_COPYDATA*/,0x233/*_WM_DROPFILES*/,0x0049/*_WM_COPYGLOBALDATA*/ )
-
 //io.open()
+
+
+var mutex = process.mutex("8B4844A9A108480A925319C27F942274")
+if(mutex.conflict){
+    return
+}
+
+exe_ext = io.splitpath(io._exefile).ext
+
+if(exe_ext == ".EXE"){
+    process.admin.runas()
+    import win.messageFilter
+    win.messageFilter.change(mainForm.hwnd,1/*_MSGFLT_ADD*/,0x4A/*_WM_COPYDATA*/,0x233/*_WM_DROPFILES*/,0x0049/*_WM_COPYGLOBALDATA*/ )
+}
 
 rename_dll := raw.loadDll($"name_exchanger_rs.dll",,"cdecl")
 
 mainForm.static_tip.oncommand = function(id,event){
-	win.msgbox("拖入文件即可使用，软件将常驻任务栏，悬停鼠标于
+    win.msgbox("拖入文件即可使用，软件将常驻任务栏，悬停鼠标于
 按钮上可获得提示。
 点击🛠️后将增加“右键菜单-发送到”，支持直接右键使用。
 如遇右键菜单失效，请右键点击🛠。
@@ -43,33 +55,46 @@ mainForm.static_tip.oncommand = function(id,event){
 
 argv_len_judge = table.len(_ARGV)
 if(argv_len_judge == 0){
-	if(io.exist(io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\name_exchanger.lnk"))){
-		lnk_exist = true
-	}else{
-		lnk_exist = false
-	}
-	if(io.splitpath(io._exefile).ext != ".exe"){
-		io.rename(io._exepath,io._exedir + io.splitpath(io._exepath).name + ".exe")
-		mainForm.static_tip.oncommand()
-	}
-	mainForm.show()
+    if(io.exist(io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\name_exchanger.lnk"))){
+        lnk_exist = true
+    }else{
+        lnk_exist = false
+    }
+
+    var should_admin_ext = ""
+    if(exe_ext == ".exe"){
+        should_admin_ext = ".exe"
+    }elseif(exe_ext == ".EXE"){
+        should_admin_ext = ".EXE"
+    }elseif(process.admin.isRunAs()){
+        should_admin_ext = ".EXE"
+    }else{
+        should_admin_ext = ".exe"
+    }
+    if(exe_ext != ".exe" and exe_ext != ".EXE"){
+        var splited_exe = io.splitpath(io._exepath)
+        io.rename(io._exepath,io._exedir + splited_exe.name + should_admin_ext)
+        mainForm.static_tip.oncommand()
+    }
+
+    mainForm.show()
 }elseif(argv_len_judge == 2){
-	//io.open()
-	result = rename_dll.exchange(_ARGV[1],_ARGV[2])
-	//io.print(result)
-	mainForm.close()
+    //io.open()
+    result = rename_dll.exchange(_ARGV[1],_ARGV[2])
+    //io.print(result)
+    mainForm.close()
 }else{
-	win.msgbox("Error for file error. Please Retry.","Error",,,1000)
-	mainForm.close()
+    win.msgbox("Error for file error. Please Retry.","Error",,,1000)
+    mainForm.close()
 }
 
 var tooltipCtrl = win.ui.tooltip(mainForm)
 var tip_table = {
-	"static_tip" = '关于\n\n關於';
-	"static_menu" = '单击可新增右键菜单-“发送到”选项\n右键点击以删除\n\n點擊新增至右鍵選單-“傳送到”選項\n點擊右鍵取消';
-	"static_top" = '置顶开关\n\n置頂開關';
-	"static_min" = '最小化';
-	"static_close" = '关闭\n\n關閉';
+    "static_tip" = '关于\n\n關於';
+    "static_menu" = '单击可新增右键菜单-“发送到”选项\n右键点击以删除\n\n點擊新增至右鍵選單-“傳送到”選項\n點擊右鍵取消';
+    "static_top" = '置顶开关\n\n置頂開關';
+    "static_min" = '最小化';
+    "static_close" = '关闭\n\n關閉';
 }
 tooltipCtrl.add(tip_table)
 mainForm.tray = win.util.tray(mainForm)
@@ -77,103 +102,103 @@ mainForm.tray.tip = '左键显示/隐藏|||右键退出\n左鍵顯示/隱藏|||�
 
 
 mainForm.onDropFiles = function(files){
-	select(tonumber(table.len(files))) {
-		case 1{
-			if(mainForm.edit_path1.text == ""){
-				mainForm.edit_path1.text = files[1]
-			}elseif(mainForm.edit_path2.text == ""){
-				mainForm.edit_path2.text = files[1]
-			}else{
-				mainForm.edit_path1.text = files[1]
-				mainForm.edit_path2.text = ""
-			}
-		}
-		case 2{
-			mainForm.edit_path1.text = files[1]
-			mainForm.edit_path2.text = files[2]
-		}
-		else{
-			win.msgbox("Error for file error. Please Retry.","Error",,mainForm.hwnd,500)
-		}
-	}
+    select(tonumber(table.len(files))) {
+        case 1{
+            if(mainForm.edit_path1.text == ""){
+                mainForm.edit_path1.text = files[1]
+            }elseif(mainForm.edit_path2.text == ""){
+                mainForm.edit_path2.text = files[1]
+            }else{
+                mainForm.edit_path1.text = files[1]
+                mainForm.edit_path2.text = ""
+            }
+        }
+        case 2{
+            mainForm.edit_path1.text = files[1]
+            mainForm.edit_path2.text = files[2]
+        }
+        else{
+            win.msgbox("Error for file error. Please Retry.","Error",,mainForm.hwnd,500)
+        }
+    }
 }
 
 mainForm.button_start.oncommand = function(id,event){
-	result = rename_dll.exchange(mainForm.edit_path1.text,mainForm.edit_path2.text)
-	//io.print(result)
-	if(result == 0){
-		mainForm.edit_path1.text = ""
-		mainForm.edit_path2.text = ""
-	}elseif(result == 1){
-		win.msgbox("No Exist","Error",,mainForm.hwnd,2000)
-	}elseif(result == 2){
-		win.msgbox("Permission Denied","Error",,mainForm.hwnd,2000)
-	}elseif(result == 3){
-		win.msgbox("New File Already Exists","Error",,mainForm.hwnd,2000)
-	}else {
-		win.msgbox("UNKNOWN ERROR","Error",,mainForm.hwnd,2000)
-	}
+    result = rename_dll.exchange(mainForm.edit_path1.text,mainForm.edit_path2.text)
+    //io.print(result)
+    if(result == 0){
+        mainForm.edit_path1.text = ""
+        mainForm.edit_path2.text = ""
+    }elseif(result == 1){
+        win.msgbox("No Exist","Error",,mainForm.hwnd,2000)
+    }elseif(result == 2){
+        win.msgbox("Permission Denied","Error",,mainForm.hwnd,2000)
+    }elseif(result == 3){
+        win.msgbox("New File Already Exists","Error",,mainForm.hwnd,2000)
+    }else {
+        win.msgbox("UNKNOWN ERROR","Error",,mainForm.hwnd,2000)
+    }
 }
 
 mainForm.onMouseDown  = function(wParam,lParam){
-	mainForm.hitCaption()	
+    mainForm.hitCaption()
 }
 
 mainForm.static_close.oncommand = function(id,event){
-	mainForm.close()
+    mainForm.close()
 }
 
 mainForm.static_top.oncommand = function(id,event){
-	if(mainForm.static_top.text == "🔱"){
-		win.setTopmost(mainForm.hwnd)
-		mainForm.static_top.text = "⚓"
-	}else{
-		win.setTopmost(mainForm.hwnd,false)
-		mainForm.static_top.text = "🔱"
-	}
+    if(mainForm.static_top.text == "🔱"){
+        win.setTopmost(mainForm.hwnd)
+        mainForm.static_top.text = "⚓"
+    }else{
+        win.setTopmost(mainForm.hwnd,false)
+        mainForm.static_top.text = "🔱"
+    }
 }
 
 mainForm.static_min.oncommand = function(id,event){
-	mainForm.show(false)
+    mainForm.show(false)
 }
 
 mainForm.onTrayMessage = {
-	[0x202/*_WM_LBUTTONUP*/] = function(wParam){
-		if(win.isVisible(mainForm.hwnd)){
-			mainForm.show(false)
-		}else{
-			mainForm.show(true)
-		}
-	}
-	[0x205/*_WM_RBUTTONUP*/] = function(wParam){
-		mainForm.close()
-	}
+    [0x202/*_WM_LBUTTONUP*/] = function(wParam){
+        if(win.isVisible(mainForm.hwnd)){
+            mainForm.show(false)
+        }else{
+            mainForm.show(true)
+        }
+    }
+    [0x205/*_WM_RBUTTONUP*/] = function(wParam){
+        mainForm.close()
+    }
 }
 
 creat_lnk = function(judge_bool){
-	if(judge_bool){
-		io.remove(io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\name_exchanger.lnk"))
-		win.msgbox("Removed","Tips",,mainForm.hwnd,1000)
-	}else{
-		var send_to_lnk = fsys.lnk()
-		send_to_lnk.description = "An lnk to filename exchange exe"
-		send_to_lnk.path = io._exepath
-		send_to_lnk.setIcon(io._exepath,0)
-		var temp_pth = io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\")
-		send_to_lnk.save(temp_pth,"name_exchanger.lnk")
-		win.msgbox("Rebuild","Tips",,mainForm.hwnd,1500)
-	}
+    if(judge_bool){
+        io.remove(io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\name_exchanger.lnk"))
+        win.msgbox("Removed","Tips",,mainForm.hwnd,1000)
+    }else{
+        var send_to_lnk = fsys.lnk()
+        send_to_lnk.description = "An lnk to filename exchange exe"
+        send_to_lnk.path = io._exepath
+        send_to_lnk.setIcon(io._exepath,0)
+        var temp_pth = io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\")
+        send_to_lnk.save(temp_pth,"name_exchanger.lnk")
+        win.msgbox("Rebuild","Tips",,mainForm.hwnd,1500)
+    }
 }
 
 mainForm.static_menu.wndproc = function(hwnd,message,wParam,lParam){
-	select(message){
-		case 0x202/*_WM_LBUTTONUP*/{
-			creat_lnk(false)
-		}
-		case 0x205/*_WM_RBUTTONUP*/{
-			creat_lnk(true)
-		}
-	}
+    select(message){
+        case 0x202/*_WM_LBUTTONUP*/{
+            creat_lnk(false)
+        }
+        case 0x205/*_WM_RBUTTONUP*/{
+            creat_lnk(true)
+        }
+    }
 }
 
 
