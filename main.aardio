@@ -5,9 +5,8 @@ import win.ui.tooltip
 import win.util.tray
 import process.admin
 import process.mutex
-
 /*DSG{{*/
-mainForm = win.form(cls="FEXC_FORM";text="Filename Exchanger";right=362;bottom=242;acceptfiles=1;border="thin";exmode="toolwindow";max=false;min=false;mode="popup";sysmenu=false;title=false;topmost=1)
+mainForm = win.form(cls="FEXC_FORM";text="FilenameExchanger";right=362;bottom=242;acceptfiles=1;border="thin";exmode="toolwindow";max=false;min=false;mode="popup";sysmenu=false;title=false;topmost=1)
 mainForm.add(
 button_start={cls="button";text="启动 | 啟動";left=118;top=183;right=245;bottom=227;default=1;font=LOGFONT(h=-19;name='微软雅黑');z=3};
 edit_path1={cls="edit";left=11;top=59;right=351;bottom=99;edge=1;z=2};
@@ -20,7 +19,7 @@ static_min={cls="static";text="G";left=292;top=4;right=319;bottom=31;align="cent
 static_path1={cls="static";text="文件一";left=11;top=39;right=57;bottom=57;font=LOGFONT(name='微软雅黑');transparent=1;z=4};
 static_path2={cls="static";text="文件二";left=11;top=106;right=57;bottom=124;font=LOGFONT(name='微软雅黑');transparent=1;z=5};
 static_tip={cls="static";text="C";left=184;top=4;right=212;bottom=31;align="center";center=1;color=0x0000FF;font=LOGFONT(h=-21;name='Microsoft YaHei UI';weight=700);notify=1;transparent=1;z=11};
-static_top={cls="static";text="A";left=4;top=4;right=31;bottom=31;align="center";center=1;color=0x00FFFF;font=LOGFONT(h=-21;name='Microsoft YaHei UI');notify=1;transparent=1;z=9}
+static_top={cls="static";text="B";left=4;top=4;right=31;bottom=31;align="center";center=1;color=0x00FFFF;font=LOGFONT(h=-21;name='Microsoft YaHei UI');notify=1;transparent=1;z=9}
 )
 /*}}*/
 
@@ -44,8 +43,14 @@ if(exe_ext == ".EXE" and (not process.admin.isRunAs())){
 
 var mutex = process.mutex("D79BA905DBC642759A74162A2FAABC28")
 if(mutex.conflict){
+	import win
+	mainForm.value = "DESTORY_WINDOW_NAME_EXCHANGER"
+	last_hwnd = process.findWindow(,"FEXC_FORM","FilenameExchanger")
+	win.show(last_hwnd)
+	win.setForeground(last_hwnd)
     return
 }
+
 
 
 rename_dll := raw.loadDll($"name_exchanger_rs.dll",,"cdecl")
@@ -71,9 +76,10 @@ mainForm.static_tip.oncommand = function(id,event){
 拖入檔案即可使用，軟體將常駐系統匣，懸停鼠標於
 按鈕上可獲得提示。
 
+軟體包含以下功能
 〇總是以系統管理員執行
-〇
-〇","Warning",,mainForm.hwnd)
+〇建立/刪除「傳送到」選單捷徑方式
+〇置頂","Warning",,mainForm.hwnd)
 }
 
 argv_len_judge = table.len(_ARGV)
@@ -99,7 +105,6 @@ if(argv_len_judge == 0){
     mainForm.show()
 }elseif(argv_len_judge == 2){
     result = rename_dll.exchange(_ARGV[1],_ARGV[2])
-    //console.print(result)
     return
 }else{
     win.msgbox("Error for file error. Please Retry.","Error",,,1000)
@@ -111,7 +116,7 @@ var tip_table = {
     "static_tip" = '关于\n\n關於';
     "static_menu" = '单击可新增右键菜单-“发送到”选项\n右键点击以删除\n\n點擊新增至右鍵選單-“傳送到”選項\n點擊右鍵取消';
     "static_top" = '置顶开关\n\n置頂開關';
-    "static_admin" = '自动以管理员启动\n\n？？？？？？';
+    "static_admin" = '自动以管理员身份启动\n\n總是以系統管理員執行';
     "static_min" = '最小化';
     "static_close" = '关闭\n\n關閉';
 }
@@ -144,7 +149,6 @@ mainForm.onDropFiles = function(files){
 
 mainForm.button_start.oncommand = function(id,event){
     result = rename_dll.exchange(mainForm.edit_path1.text,mainForm.edit_path2.text)
-    //console.print(result)
     if(result == 0){
         mainForm.edit_path1.text = ""
         mainForm.edit_path2.text = ""
