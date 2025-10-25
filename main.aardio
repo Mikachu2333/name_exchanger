@@ -1,42 +1,48 @@
+import fonts
 import fsys.lnk
 import win.ui
 import win.ui.tooltip
 import win.util.tray
 import process.admin
 import process.mutex
+
 /*DSG{{*/
 mainForm = win.form(cls="FEXC_FORM";text="Filename Exchanger";right=362;bottom=242;acceptfiles=1;border="thin";exmode="toolwindow";max=false;min=false;mode="popup";sysmenu=false;title=false;topmost=1)
 mainForm.add(
 button_start={cls="button";text="启动 | 啟動";left=118;top=183;right=245;bottom=227;default=1;font=LOGFONT(h=-19;name='微软雅黑');z=3};
 edit_path1={cls="edit";left=11;top=59;right=351;bottom=99;edge=1;z=2};
 edit_path2={cls="edit";left=11;top=126;right=351;bottom=166;edge=1;z=6};
+static_admin={cls="static";left=222;top=4;right=249;bottom=31;align="center";bgcolor=0x000000;center=1;color=0xFFFFFF;font=LOGFONT(h=-21;name='Microsoft YaHei UI');notify=1;transparent=1;z=12};
 static_bg={cls="static";left=0;top=0;right=363;bottom=33;bgcolor=0xD77800;z=1};
-static_close={cls="static";text='\u26DD';left=329;top=2;right=356;bottom=29;align="center";center=1;color=0xFFFFFF;font=LOGFONT(h=-26;name='微软雅黑');notify=1;transparent=1;z=8};
-static_menu={cls="static";text='\uD83D\uDEE0\uFE0F';left=256;top=2;right=283;bottom=29;align="center";bgcolor=0x000000;center=1;color=0xFFFFFF;font=LOGFONT(h=-20;name='微软雅黑');notify=1;transparent=1;z=10};
-static_min={cls="static";text="-";left=292;top=2;right=319;bottom=29;align="center";center=1;color=0xFFFFFF;font=LOGFONT(h=-30;name='微软雅黑');notify=1;transparent=1;z=7};
+static_close={cls="static";text="H";left=328;top=4;right=356;bottom=31;align="center";center=1;color=0xFFFFFF;font=LOGFONT(h=-21;name='Microsoft YaHei UI';weight=700);notify=1;transparent=1;z=8};
+static_menu={cls="static";text="F";left=258;top=4;right=285;bottom=31;align="center";bgcolor=0x000000;center=1;color=0xFFFFFF;font=LOGFONT(h=-21;name='Microsoft YaHei UI');notify=1;transparent=1;z=10};
+static_min={cls="static";text="G";left=292;top=4;right=319;bottom=31;align="center";center=1;color=0xFFFFFF;font=LOGFONT(h=-21;name='Microsoft YaHei UI');notify=1;transparent=1;z=7};
 static_path1={cls="static";text="文件一";left=11;top=39;right=57;bottom=57;font=LOGFONT(name='微软雅黑');transparent=1;z=4};
 static_path2={cls="static";text="文件二";left=11;top=106;right=57;bottom=124;font=LOGFONT(name='微软雅黑');transparent=1;z=5};
-static_tip={cls="static";text='\u2753';left=222;top=2;right=249;bottom=29;align="center";center=1;color=0x0000FF;font=LOGFONT(h=-22;name='微软雅黑');notify=1;transparent=1;z=11};
-static_top={cls="static";text='\u2693';left=4;top=2;right=31;bottom=29;align="center";center=1;color=0x00FFFF;font=LOGFONT(h=-24;name='微软雅黑');notify=1;transparent=1;z=9}
+static_tip={cls="static";text="C";left=184;top=4;right=212;bottom=31;align="center";center=1;color=0x0000FF;font=LOGFONT(h=-21;name='Microsoft YaHei UI';weight=700);notify=1;transparent=1;z=11};
+static_top={cls="static";text="A";left=4;top=4;right=31;bottom=31;align="center";center=1;color=0x00FFFF;font=LOGFONT(h=-21;name='Microsoft YaHei UI');notify=1;transparent=1;z=9}
 )
 /*}}*/
 
-
-//io.open()
-
+import console
 
 exe_ext = io.splitpath(io._exefile).ext
+is_admin = false
 
 if(exe_ext == ".EXE" and (not process.admin.isRunAs())){
     process.admin.runas()
-    return ; 
+    return 
 }elseif(process.admin.isRunAs()){
+	is_admin = true
     import win.messageFilter
     win.messageFilter.change(mainForm.hwnd,1/*_MSGFLT_ADD*/,0x4A/*_WM_COPYDATA*/,0x233/*_WM_DROPFILES*/,0x0049/*_WM_COPYGLOBALDATA*/ )
+}else{
+	is_admin = false
 }
 
 
-var mutex = process.mutex("8B4844A9A108480A925319C27F942274")
+
+var mutex = process.mutex("D79BA905DBC642759A74162A2FAABC28")
 if(mutex.conflict){
     return
 }
@@ -44,18 +50,30 @@ if(mutex.conflict){
 
 rename_dll := raw.loadDll($"name_exchanger_rs.dll",,"cdecl")
 
+
+custom_font = fonts.addFamily($"/res/NameExchangeCustom.ttf","NameExchangeCustom")
+mainForm.static_top.setFont(custom_font)
+mainForm.static_tip.setFont(custom_font)
+mainForm.static_admin.setFont(custom_font)
+mainForm.static_menu.setFont(custom_font)
+mainForm.static_min.setFont(custom_font)
+mainForm.static_close.setFont(custom_font)
+
 mainForm.static_tip.oncommand = function(id,event){
     win.msgbox("拖入文件即可使用，软件将常驻任务栏，悬停鼠标于
 按钮上可获得提示。
-点击🛠️后将增加“右键菜单-发送到”，支持直接右键使用。
-如遇右键菜单失效，请右键点击🛠。
-左上角⚓/🔱是置顶开关。
+
+软件包含以下功能
+〇管理员身份启动
+〇创建/删除「发送到」菜单快捷方式
+〇置顶
 
 拖入檔案即可使用，軟體將常駐系統匣，懸停鼠標於
 按鈕上可獲得提示。
-點擊🛠️後可新增功能“右鍵選單-傳送到”，支援直接右鍵使用。
-如果右鍵選單失效，請右鍵點擊🛠。
-左上方⚓/🔱是置頂開關。","Warning",,mainForm.hwnd)
+
+〇總是以系統管理員執行
+〇
+〇","Warning",,mainForm.hwnd)
 }
 
 argv_len_judge = table.len(_ARGV)
@@ -66,31 +84,26 @@ if(argv_len_judge == 0){
         lnk_exist = false
     }
 
-    var should_admin_ext = ""
-    if(exe_ext == ".exe"){
-        should_admin_ext = ".exe"
-    }elseif(exe_ext == ".EXE"){
-        should_admin_ext = ".EXE"
-    }elseif(process.admin.isRunAs()){
-        should_admin_ext = ".EXE"
-    }else{
-        should_admin_ext = ".exe"
-    }
     if(exe_ext != ".exe" and exe_ext != ".EXE"){
-        var splited_exe = io.splitpath(io._exepath)
-        io.rename(io._exepath,io._exedir + splited_exe.name + should_admin_ext)
+        io.rename(io._exepath,io._exedir + io.splitpath(io._exepath).name + ".exe")
         mainForm.static_tip.oncommand()
     }
+    
+    if(not is_admin){
+    	mainForm.static_admin.text = "D"
+    }else{
+    	mainForm.static_admin.text = "E"
+    }
+    
 
     mainForm.show()
 }elseif(argv_len_judge == 2){
-    //io.open()
     result = rename_dll.exchange(_ARGV[1],_ARGV[2])
-    //io.print(result)
-    mainForm.close()
+    //console.print(result)
+    return
 }else{
     win.msgbox("Error for file error. Please Retry.","Error",,,1000)
-    mainForm.close()
+    return
 }
 
 var tooltipCtrl = win.ui.tooltip(mainForm)
@@ -98,6 +111,7 @@ var tip_table = {
     "static_tip" = '关于\n\n關於';
     "static_menu" = '单击可新增右键菜单-“发送到”选项\n右键点击以删除\n\n點擊新增至右鍵選單-“傳送到”選項\n點擊右鍵取消';
     "static_top" = '置顶开关\n\n置頂開關';
+    "static_admin" = '自动以管理员启动\n\n？？？？？？';
     "static_min" = '最小化';
     "static_close" = '关闭\n\n關閉';
 }
@@ -130,7 +144,7 @@ mainForm.onDropFiles = function(files){
 
 mainForm.button_start.oncommand = function(id,event){
     result = rename_dll.exchange(mainForm.edit_path1.text,mainForm.edit_path2.text)
-    //io.print(result)
+    //console.print(result)
     if(result == 0){
         mainForm.edit_path1.text = ""
         mainForm.edit_path2.text = ""
@@ -154,12 +168,12 @@ mainForm.static_close.oncommand = function(id,event){
 }
 
 mainForm.static_top.oncommand = function(id,event){
-    if(mainForm.static_top.text == "🔱"){
+    if(mainForm.static_top.text == "A"){
         win.setTopmost(mainForm.hwnd)
-        mainForm.static_top.text = "⚓"
+        mainForm.static_top.text = "B"
     }else{
         win.setTopmost(mainForm.hwnd,false)
-        mainForm.static_top.text = "🔱"
+        mainForm.static_top.text = "A"
     }
 }
 
@@ -186,7 +200,7 @@ creat_lnk = function(judge_bool){
         win.msgbox("Removed","Tips",,mainForm.hwnd,1000)
     }else{
         var send_to_lnk = fsys.lnk()
-        send_to_lnk.description = "An lnk to filename exchange exe"
+        send_to_lnk.description = "Lnk to FilenameExchanger"
         send_to_lnk.path = io._exepath
         send_to_lnk.setIcon(io._exepath,0)
         var temp_pth = io.joinpath(io.getSpecial(0x1a/*_CSIDL_APPDATA*/),"Microsoft\Windows\SendTo\")
@@ -206,5 +220,14 @@ mainForm.static_menu.wndproc = function(hwnd,message,wParam,lParam){
     }
 }
 
+mainForm.static_admin.oncommand = function(id,event){
+    if(mainForm.static_admin.text == "D"){
+        io.rename(io._exepath,io._exedir + io.splitpath(io._exepath).name + ".EXE")
+        mainForm.static_admin.text = "E"
+    }else{
+        io.rename(io._exepath,io._exedir + io.splitpath(io._exepath).name + ".exe")
+        mainForm.static_admin.text = "D"
+    }
+}
 
 return win.loopMessage()
