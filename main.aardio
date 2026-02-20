@@ -51,7 +51,11 @@ get_output_info = function(id){
     }elseif(id == 2){
         return false, "Permission Denied"
     }elseif(id == 3){
-        return false, "New File Already Exists"
+        return false, "Target File Already Exists"
+    }elseif(id == 4){
+        return false, "Two Paths Refer to the Same File"
+    }elseif(id == 5){
+        return false, "Invalid Path (e.g. non-UTF-8)"
     }else {
         return false, "UNKNOWN ERROR"
     }
