@@ -1,10 +1,13 @@
 # name_exchanger
+
 更换两个文件的名字。Exchange two files' name, write by aardio
 
-# 直接拖入文件（1个或者2个均可，也可手写文件路径）
-# Directly drag in files (1 or 2 can be selected, or write file path manually)
+## 直接拖入文件（1个或者2个均可，也可手写文件路径）
+<!--  xxx  -->
+## Directly drag in files (1 or 2 can be selected, or write file path manually)
+<!--  xxx  -->
+## 使用说明
 
-# 使用说明
 拖入文件即可使用，软件自动常驻任务栏，悬停鼠标于右上角图标可获得提示。
 
 点击🛠️后将添加“右键菜单-发送到”，支持不打开直接使用。
@@ -23,8 +26,8 @@
 
 右下方⚓/🔱為置頂開關。
 
-![图片](https://github.com/Mikachu2333/name_exchanger/assets/63829496/e444b75d-c7b2-462e-86c3-d73a49749c82)
+![example](./PixPin_2026-02-20_23-10-00.png)
 
-# Lib
+## Lib
+
 [https://github.com/Mikachu2333/name_exchanger_rslib](https://github.com/Mikachu2333/exchange_name_lib)
-
