@@ -1,3 +1,10 @@
+# 因多种原因，本项目将停止维护，请尽快更换至C++版本！
+# Due to various reasons, this project will stop maintenance, please switch to the C++ version as soon as possible!
+
+# https://github.com/Mikachu2333/name_exchanger_cpp
+
+---
+
 # name_exchanger
 
 更换两个文件的名字。Exchange two files' name, write by aardio
